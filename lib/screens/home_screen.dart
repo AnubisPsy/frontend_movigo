@@ -1,29 +1,22 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import '../widgets/profile_button.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Inicio'),
+        title: Text('MoviGO'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ProfileButton(),
           ),
         ],
       ),
       body: Center(
-        child: Text(
-          '¡Bienvenido!',
-          style: TextStyle(fontSize: 24),
-        ),
+        child: Text('Contenido del Home'),
       ),
     );
   }

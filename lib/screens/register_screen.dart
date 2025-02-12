@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -9,11 +11,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   String _selectedRole = 'Pasajero';
   final _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _nombreController = TextEditingController();
+  final _apellidoController = TextEditingController();
+  final _authService = AuthService();
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _emailController.dispose();
+    _nombreController.dispose();
+    _apellidoController.dispose();
     super.dispose();
+  }
+
+  Future<void> _register() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        debugPrint('Iniciando registro...');
+        final response = await _authService.register(
+          _emailController.text,
+          _passwordController.text,
+          _nombreController.text,
+          _apellidoController.text,
+        );
+        debugPrint('Respuesta del registro: $response');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registro exitoso')),
+        );
+        Navigator.pop(context);
+      } catch (e) {
+        debugPrint('Error en registro: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
   }
 
   @override
@@ -28,6 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
+                controller: _nombreController,
                 decoration: InputDecoration(
                   labelText: 'Nombre',
                   prefixIcon: Icon(Icons.person),
@@ -41,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 16),
               TextFormField(
+                controller: _apellidoController,
                 decoration: InputDecoration(
                   labelText: 'Apellido',
                   prefixIcon: Icon(Icons.person_outline),
@@ -54,6 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 16),
               TextFormField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email),
@@ -128,12 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Aquí iría la lógica de registro
-                    Navigator.pop(context);
-                  }
-                },
+                onPressed: _register,
                 child: Text('Registrarse'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 48),
