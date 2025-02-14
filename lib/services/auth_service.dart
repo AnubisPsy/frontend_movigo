@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/viaje_estado.dart'; // Si necesitas los modelos
 
 class AuthService {
-  final String baseUrl = 'http://192.168.0.112:3000/api/auth';
+  //final String baseUrl = 'http://192.168.0.112:3000/api/auth';
+  final String baseUrl = 'http://192.168.1.219:3000/api/auth';
 
-  //final String baseUrl = 'http://192.168.1.219:3000/api/auth';
+  static String? _currentUserId;
+  static String? get currentUserId => _currentUserId;
 
-  // Login
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
+      debugPrint('====== DEBUG AUTH SERVICE ======');
       debugPrint('Iniciando login...');
       debugPrint('Email: $email');
 
@@ -23,10 +27,22 @@ class AuthService {
       );
 
       debugPrint('Status Code: ${response.statusCode}');
-      debugPrint('Response: ${response.body}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+
+        // Guardar en SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userId', data['user']['id']);
+        await prefs.setInt('userRole', data['user']['rol']);
+
+        debugPrint(
+            'userId guardado en SharedPreferences: ${data['user']['id']}');
+        debugPrint(
+            'userRole guardado en SharedPreferences: ${data['user']['rol']}');
+
+        return data;
       } else {
         throw Exception(json.decode(response.body)['message']);
       }

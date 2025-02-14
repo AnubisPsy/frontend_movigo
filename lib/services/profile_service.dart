@@ -4,9 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
 class ProfileService {
-  final String baseUrl = 'http://192.168.0.112:3000/api/perfil';
+  //final String baseUrl = 'http://192.168.0.112:3000/api/perfil';
 
-  //final String baseUrl = 'http://192.168.1.219:3000/api/perfil';
+  final String baseUrl = 'http://192.168.1.219:3000/api/perfil';
 
   Future<Map<String, dynamic>> getProfile(String userId) async {
     try {
