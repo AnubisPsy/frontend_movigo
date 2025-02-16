@@ -1,9 +1,11 @@
+// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../screens/role_handler.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -15,47 +17,61 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
+  bool _isLoading = false;
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       try {
         debugPrint('Iniciando login...');
-        final response = await _authService.login(
+        final Map<String, dynamic> response = await _authService.login(
           _emailController.text,
           _passwordController.text,
         );
 
-        debugPrint(
-            'Respuesta completa del login: $response'); // Ver la respuesta completa
+        debugPrint('Respuesta completa del login: $response');
 
         if (response.containsKey('user')) {
           final prefs = await SharedPreferences.getInstance();
 
-          // Guardar ID y verificar
+          // Guardar ID y otros datos de texto
           await prefs.setString('userId', response['user']['id']);
-          final savedId = prefs.getString('userId');
-          debugPrint('ID guardado: $savedId');
-
-          // Guardar otros datos
           await prefs.setString('userName', response['user']['nombre']);
           await prefs.setString('userEmail', response['user']['email']);
 
+          // Guardar el rol como int
+          final userRole = response['user']['rol'];
+          await prefs.setInt('userRole', userRole);
+
+          debugPrint('ID guardado: ${response['user']['id']}');
+          debugPrint('Rol guardado: $userRole');
+
+          if (!mounted) return;
+
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login exitoso')),
+            const SnackBar(content: Text('Login exitoso')),
           );
+
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(
+              builder: (_) => RoleHandler(),
+            ),
           );
         }
       } catch (e) {
         debugPrint('Error en login: $e');
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text('Error al iniciar sesión: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
     }
   }
@@ -63,17 +79,17 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Iniciar Sesión')),
+      appBar: AppBar(title: const Text('Iniciar Sesión')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
-                controller: _emailController, // Añadido controller
-                decoration: InputDecoration(
+                controller: _emailController,
+                decoration: const InputDecoration(
                   labelText: 'Email',
                   prefixIcon: Icon(Icons.email),
                 ),
@@ -84,10 +100,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
-                controller: _passwordController, // Añadido controller
-                decoration: InputDecoration(
+                controller: _passwordController,
+                decoration: const InputDecoration(
                   labelText: 'Contraseña',
                   prefixIcon: Icon(Icons.lock),
                 ),
@@ -99,15 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _login, // Cambiado para usar la función de login
-                child: Text('Ingresar'),
+                onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 48),
+                  minimumSize: const Size(double.infinity, 48),
                 ),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Ingresar'),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -115,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     MaterialPageRoute(builder: (context) => RegisterScreen()),
                   );
                 },
-                child: Text('¿No tienes cuenta? Regístrate'),
+                child: const Text('¿No tienes cuenta? Regístrate'),
               ),
               TextButton(
                 onPressed: () {
@@ -125,12 +143,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         builder: (context) => ForgotPasswordScreen()),
                   );
                 },
-                child: Text('¿Olvidaste tu contraseña?'),
+                child: const Text('¿Olvidaste tu contraseña?'),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

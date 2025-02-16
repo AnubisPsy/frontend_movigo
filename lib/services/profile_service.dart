@@ -2,11 +2,38 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart'; // Añade esta importación
+import '../utils/dio_config.dart';
 
 class ProfileService {
-  //final String baseUrl = 'http://192.168.0.112:3000/api/perfil';
+  final String baseUrl = 'http://192.168.0.112:3000/api/perfil';
 
-  final String baseUrl = 'http://192.168.1.219:3000/api/perfil';
+  //final String baseUrl = 'http://192.168.1.219:3000/api/perfil';
+
+  final Dio _dio = DioConfig.getInstance();
+
+  Future<Map<String, dynamic>> obtenerPerfil() async {
+    try {
+      final response = await _dio.get('/perfil');
+      if (response.statusCode == 200) {
+        return response.data['data'];
+      }
+      throw Exception('Error al obtener perfil');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> actualizarPerfil(Map<String, dynamic> datos) async {
+    try {
+      final response = await _dio.put('/perfil/actualizar', data: datos);
+      if (response.statusCode != 200) {
+        throw Exception('Error al actualizar perfil');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   Future<Map<String, dynamic>> getProfile(String userId) async {
     try {

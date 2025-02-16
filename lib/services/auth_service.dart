@@ -1,60 +1,43 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/viaje_estado.dart'; // Si necesitas los modelos
+import '../utils/dio_config.dart';
 
 class AuthService {
-  //final String baseUrl = 'http://192.168.0.112:3000/api/auth';
-  final String baseUrl = 'http://192.168.1.219:3000/api/auth';
+  final String baseUrl = 'http://192.168.0.112:3000/api/auth';
+  //final String baseUrl = 'http://192.168.1.219:3000/api/auth';
 
+  final Dio _dio = DioConfig.getInstance();
   static String? _currentUserId;
   static String? get currentUserId => _currentUserId;
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      debugPrint('====== DEBUG AUTH SERVICE ======');
-      debugPrint('Iniciando login...');
-      debugPrint('Email: $email');
-
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email,
-          'contraseña': password,
-        }),
-      );
-
-      debugPrint('Status Code: ${response.statusCode}');
-      debugPrint('Response body: ${response.body}');
+      final response = await _dio.post('/auth/login', data: {
+        'email': email,
+        'password': password,
+      });
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // Guardar en SharedPreferences
+        final token = response.data['token'];
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('userId', data['user']['id']);
-        await prefs.setInt('userRole', data['user']['rol']);
-
-        debugPrint(
-            'userId guardado en SharedPreferences: ${data['user']['id']}');
-        debugPrint(
-            'userRole guardado en SharedPreferences: ${data['user']['rol']}');
-
-        return data;
-      } else {
-        throw Exception(json.decode(response.body)['message']);
+        await prefs.setString('token', token);
+        debugPrint('Token guardado: $token');
+        return response.data; // Devolver la respuesta completa
       }
+      throw Exception('Error en el login');
     } catch (e) {
       debugPrint('Error en login: $e');
-      throw Exception('Error de conexión: $e');
+      rethrow;
     }
   }
 
   // Registro
-  Future<Map<String, dynamic>> register(
-      String email, String password, String name, String lastName) async {
+  Future<Map<String, dynamic>> register(String email, String password,
+      String name, String lastName, int rol) async {
     try {
       debugPrint('Iniciando registro...');
       debugPrint('Datos a enviar: $email, $name, $lastName');
@@ -67,7 +50,7 @@ class AuthService {
           'contraseña': password,
           'nombre': name,
           'apellido': lastName,
-          'rol': 1,
+          'rol': rol,
         }),
       );
 

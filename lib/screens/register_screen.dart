@@ -34,6 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _passwordController.text,
           _nombreController.text,
           _apellidoController.text,
+          _selectedRole == 'Pasajero' ? 1 : 2,
         );
         debugPrint('Respuesta del registro: $response');
 
