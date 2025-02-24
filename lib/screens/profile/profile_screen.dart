@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movigo_frontend/data/services/profile_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -29,18 +30,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       final token = await StorageService.getToken();
-      print('Token en ProfileScreen: $token'); // Debug
 
       if (token == null || token.isEmpty) {
-        print('No se encontró token, redirigiendo a login'); // Debug
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/login');
+          RouteHelper.goToLogin(context);
         }
         return;
       }
 
       final userData = await ProfileService.getUserProfile(token);
-      print('Datos del usuario recibidos: $userData'); // Debug
 
       if (mounted) {
         setState(() {
@@ -49,7 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     } catch (e) {
-      print('Error en loadUserData: $e'); // Debug
       if (mounted) {
         setState(() {
           _error = e.toString();
@@ -64,19 +61,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pushReplacementNamed(context, '/passenger/home'),
-        ),
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => RouteHelper.goToPassengerHome(context)),
         title: const Text('Mi Perfil'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/profile/edit',
-                arguments: _userData,
-              ).then((_) => _loadUserData());
+            onPressed: () async {
+              await RouteHelper.goToEditProfile(context, _userData ?? {});
+              _loadUserData();
             },
           ),
         ],
@@ -123,19 +116,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Botones de acción
           CustomButton(
-            text: 'Cambiar Contraseña',
-            onPressed: () {
-              Navigator.pushNamed(context, '/profile/change-password');
-            },
-          ),
+              text: 'Cambiar Contraseña',
+              onPressed: () => RouteHelper.goToChangePassword(context)),
           const SizedBox(height: 16),
 
           if (_userData?['rol'] == '2') // Solo para conductores
             CustomButton(
               text: 'Información del Vehículo',
-              onPressed: () {
-                Navigator.pushNamed(context, '/driver/vehicle-info');
-              },
+              onPressed: () => RouteHelper.goToVehicleInfo(context),
             ),
 
           const SizedBox(height: 32),
@@ -184,13 +172,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout() async {
-    await StorageService.clearAll();
-    if (mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/login',
-        (route) => false,
-      );
+    // Mostrar diálogo de confirmación
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cerrar Sesión'),
+        content: const Text('¿Estás seguro que deseas cerrar sesión?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text(
+              'Cerrar Sesión',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLogout ?? false) {
+      await StorageService.clearAll();
+      if (mounted) {
+        RouteHelper.goToLogin(context);
+      }
     }
   }
 }

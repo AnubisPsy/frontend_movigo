@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/widgets/trip/trip_card.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   const ActiveTripScreen({super.key});
@@ -80,12 +81,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                       const Spacer(),
                       CustomButton(
                         text: 'Finalizar',
-                        onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            '/passenger-home',
-                            (route) => false,
-                          );
-                        },
+                        onPressed: () => RouteHelper.goToPassengerHome(context),
                       ),
                     ],
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class PassengerHomeScreen extends StatefulWidget {
   const PassengerHomeScreen({super.key});
@@ -18,14 +19,12 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
-              // Navegar al historial
+              RouteHelper.goToPassengerHistory(context);
             },
           ),
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/profile');
-            },
+            onPressed: () => RouteHelper.goToProfile(context),
           ),
         ],
       ),

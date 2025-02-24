@@ -3,6 +3,7 @@ import 'package:movigo_frontend/data/services/profile_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/widgets/common/custom_text_field.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -92,7 +93,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         final token = await StorageService.getToken();
         if (token == null) {
           if (mounted) {
-            Navigator.pushReplacementNamed(context, '/login');
+            RouteHelper.goToLogin(context);
           }
           return;
         }

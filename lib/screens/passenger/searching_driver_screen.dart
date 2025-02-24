@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class SearchingDriverScreen extends StatefulWidget {
   const SearchingDriverScreen({super.key});
@@ -127,16 +128,13 @@ class _SearchingDriverScreenState extends State<SearchingDriverScreen>
         content: const Text('¿Estás seguro que deseas cancelar la búsqueda?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => RouteHelper.closeDialog(context),
             child: const Text('No'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Cerrar diálogo
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/passenger-home',
-                (route) => false,
-              );
+              RouteHelper.closeDialog(context);
+              RouteHelper.goToPassengerHome(context);
             },
             child: const Text('Sí'),
           ),

@@ -3,6 +3,7 @@ import 'package:movigo_frontend/data/services/profile_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/widgets/common/custom_text_field.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -37,7 +38,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            // Verificar si hay cambios sin guardar
+            if (_hasUnsavedChanges()) {
+              _showDiscardChangesDialog();
+            } else {
+              Navigator.pop(context);
+            }
           },
         ),
         title: const Text('Editar Perfil'),
@@ -51,9 +57,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               CustomTextField(
                 label: 'Nombre',
                 controller: _nombreController,
+                textCapitalization: TextCapitalization.words,
                 validator: (value) {
                   if (value?.isEmpty ?? true) {
                     return 'Por favor ingrese su nombre';
+                  }
+                  if (value!.length < 2) {
+                    return 'El nombre debe tener al menos 2 caracteres';
+                  }
+                  if (!RegExp(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$').hasMatch(value)) {
+                    return 'El nombre solo debe contener letras';
                   }
                   return null;
                 },
@@ -78,7 +91,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   if (value?.isEmpty ?? true) {
                     return 'Por favor ingrese su email';
                   }
-                  if (!value!.contains('@')) {
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                      .hasMatch(value!)) {
                     return 'Ingrese un email válido';
                   }
                   return null;
@@ -105,7 +119,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final token = await StorageService.getToken();
         if (token == null) {
           if (mounted) {
-            Navigator.pushReplacementNamed(context, '/login');
+            RouteHelper.goToLogin(context);
           }
           return;
         }
@@ -140,6 +154,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           setState(() => _isLoading = false);
         }
       }
+    }
+  }
+
+  bool _hasUnsavedChanges() {
+    final userData =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    return userData != null &&
+        (_nombreController.text != userData['nombre'] ||
+            _apellidoController.text != userData['apellido'] ||
+            _emailController.text != userData['email']);
+  }
+
+  Future<void> _showDiscardChangesDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cambios sin guardar'),
+        content: const Text('¿Deseas descartar los cambios realizados?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text(
+              'Descartar',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (result ?? false) {
+      Navigator.pop(context);
     }
   }
 
