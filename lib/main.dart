@@ -7,15 +7,12 @@ import 'package:movigo_frontend/screens/auth/reset_password_screen.dart';
 
 // Pantallas de pasajero
 import 'package:movigo_frontend/screens/passenger/passenger_home_screen.dart';
-import 'package:movigo_frontend/screens/passenger/request_trip_screen.dart';
-import 'package:movigo_frontend/screens/passenger/active_trip_screen.dart';
-import 'package:movigo_frontend/screens/passenger/trip_history_screen.dart';
+import 'package:movigo_frontend/screens/passenger/passenger_history_screen.dart';
 
 // Pantallas de conductor
 import 'package:movigo_frontend/screens/driver/driver_home_screen.dart';
 import 'package:movigo_frontend/screens/driver/driver_info_screen.dart';
 import 'package:movigo_frontend/screens/driver/vehicle_info_screen.dart';
-import 'package:movigo_frontend/screens/driver/active_trip_driver_screen.dart';
 import 'package:movigo_frontend/screens/driver/driver_trip_history_screen.dart';
 
 //Pantallas del perfil
@@ -58,19 +55,13 @@ class MyApp extends StatelessWidget {
 
         // Rutas de pasajero
         '/passenger/home': (context) => const PassengerHomeScreen(),
-        '/passenger/request-trip': (context) => const RequestTripScreen(
-              origin: 'Origen de ejemplo',
-              destination: 'Destino de ejemplo',
-            ),
-        '/passenger/active-trip': (context) => const ActiveTripScreen(),
         '/passenger/history': (context) => const TripHistoryScreen(),
 
         // Rutas de conductor
-        '/driver/home': (context) => const DriverHomeScreen(),
+//        '/driver/home': (context) => const DriverHomeScreen(),
         '/driver/info': (context) => const DriverInfoScreen(),
         '/driver/vehicle-info': (context) => const VehicleInfoScreen(),
-        '/driver/active-trip': (context) => const ActiveTripDriverScreen(),
-        '/driver/history': (context) => const DriverTripHistoryScreen(),
+//        '/driver/history': (context) => const DriverTripHistoryScreen(),
       },
       // Manejo de rutas no definidas
       onUnknownRoute: (settings) {

@@ -15,6 +15,6 @@ class ApiConstants {
   static const String updateUserProfile = '/usuarios/profile';
   static const String changePassword = '/usuarios/cambiar-password';
 
-   static const String tripHistory = '/viajes/historial';
-   
+  static const String tripHistory = '/viajes/historial';
+  static const String goToRequestTrip = '/viajes';
 }

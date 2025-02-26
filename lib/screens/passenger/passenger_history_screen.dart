@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/trip/trip_card.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/trips_service.dart';
+import 'package:movigo_frontend/data/services/passenger_service.dart';
+import 'package:intl/intl.dart';
 
 class TripHistoryScreen extends StatefulWidget {
   const TripHistoryScreen({super.key});
@@ -12,13 +13,13 @@ class TripHistoryScreen extends StatefulWidget {
 }
 
 class _TripHistoryScreenState extends State<TripHistoryScreen> {
-  final TripsService _tripsService = TripsService();
+  final PassengerService _passengerService = PassengerService();
 
   bool _isLoading = false;
   List<Map<String, dynamic>> _allTrips = []; // Lista original sin filtrar
   List<Map<String, dynamic>> _trips = []; // Lista filtrada para mostrar
 
-// Variables para filtros
+  // Variables para filtros
   DateTime? _startDate;
   DateTime? _endDate;
   double? _minCost;
@@ -34,13 +35,8 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   Future<void> _loadTrips() async {
     setState(() => _isLoading = true);
     try {
-      // Llamada al backend usando nuestro servicio
-      final loadedTrips = await _tripsService.getTripHistory(
-        startDate: _startDate,
-        endDate: _endDate,
-        minCost: _minCost,
-        maxCost: _maxCost,
-      );
+      // Llamada al backend usando nuestro servicio de pasajero
+      final loadedTrips = await _passengerService.getTripHistory();
 
       setState(() {
         _allTrips = loadedTrips;
@@ -61,7 +57,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     }
   }
 
-// Aplicar filtros a la lista original
+  // Aplicar filtros a la lista original
   void _applyFilters() {
     setState(() {
       _trips = _allTrips.where((trip) {
@@ -101,7 +97,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     });
   }
 
-// Resetear todos los filtros
+  // Resetear todos los filtros
   void _resetFilters() {
     setState(() {
       _startDate = null;
@@ -207,6 +203,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               vehicleInfo: trip['vehicleInfo'],
               cost: trip['cost'],
               type: TripCardType.history,
+              passengerName: null,
             ),
           ),
         );
@@ -262,7 +259,8 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                               },
                               child: Text(_startDate == null
                                   ? 'Fecha inicio'
-                                  : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'),
+                                  : DateFormat('dd/MM/yyyy')
+                                      .format(_startDate!)),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -283,7 +281,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                               },
                               child: Text(_endDate == null
                                   ? 'Fecha fin'
-                                  : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'),
+                                  : DateFormat('dd/MM/yyyy').format(_endDate!)),
                             ),
                           ),
                         ],
@@ -439,9 +437,35 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               vehicleInfo: trip['vehicleInfo'],
               cost: trip['cost'],
               type: TripCardType.history,
+              passengerName: null,
             ),
             const SizedBox(height: 16),
-            // Aquí podrías agregar más detalles del viaje
+            // Detalles adicionales del viaje
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDetailRow('Fecha:',
+                      DateFormat('dd/MM/yyyy HH:mm').format(trip['date'])),
+                  const Divider(),
+                  _buildDetailRow('Origen:', trip['origin']),
+                  const Divider(),
+                  _buildDetailRow('Destino:', trip['destination']),
+                  const Divider(),
+                  _buildDetailRow('Conductor:', trip['driverName']),
+                  const Divider(),
+                  _buildDetailRow('Vehículo:', trip['vehicleInfo']),
+                  const Divider(),
+                  _buildDetailRow(
+                      'Costo:', '\$${trip['cost'].toStringAsFixed(2)}'),
+                ],
+              ),
+            ),
             const Spacer(),
             CustomButton(
               text: 'Reportar Problema',
@@ -452,6 +476,35 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
