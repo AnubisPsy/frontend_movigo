@@ -62,7 +62,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => RouteHelper.goToPassengerHome(context)),
+            onPressed: () {
+              // Verificar el rol del usuario que ya está cargado en _userData
+              if (_userData != null && _userData!['rol'] == '2') {
+                RouteHelper.goToDriverHome(context);
+              } else {
+                RouteHelper.goToPassengerHome(context);
+              }
+            }),
         title: const Text('Mi Perfil'),
         actions: [
           IconButton(

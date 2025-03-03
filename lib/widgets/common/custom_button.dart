@@ -5,6 +5,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
   final bool fullWidth;
+  final IconData? icon; // Add this new optional parameter
 
   const CustomButton({
     super.key,
@@ -12,6 +13,7 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.fullWidth = true,
+    this.icon, // Add icon to the constructor
   });
 
   @override
@@ -35,7 +37,17 @@ class CustomButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : Text(text),
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) // Conditionally show icon if it exists
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(icon, color: Colors.white),
+                    ),
+                  Text(text),
+                ],
+              ),
       ),
     );
   }

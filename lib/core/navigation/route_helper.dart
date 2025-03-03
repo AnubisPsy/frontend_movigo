@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movigo_frontend/data/services/storage_service.dart';
 
 class RouteHelper {
   // Rutas de Autenticación
@@ -25,6 +26,18 @@ class RouteHelper {
       '/verify-code',
       arguments: arguments,
     );
+  }
+
+  static void goToDriverInfo(BuildContext context) {
+    Navigator.pushNamed(context, '/driver/info');
+  }
+
+  static void goToVehicleInfo(BuildContext context) {
+    Navigator.pushNamed(context, '/driver/vehicle-info');
+  }
+
+  static void goToDriverHistory(BuildContext context) {
+    Navigator.pushNamed(context, '/driver/history');
   }
 
   static void goToResetPassword(
@@ -95,25 +108,27 @@ class RouteHelper {
     );
   }
 
-  static void goToDriverInfo(BuildContext context) {
-    Navigator.pushNamed(context, '/driver/info');
-  }
-
-  static void goToVehicleInfo(BuildContext context) {
-    Navigator.pushNamed(context, '/driver/vehicle-info');
-  }
-
   static void goToDriverActiveTrip(BuildContext context) {
     Navigator.pushNamed(context, '/driver/active-trip');
   }
 
-  static void goToDriverHistory(BuildContext context) {
-    Navigator.pushNamed(context, '/driver/history');
-  }
-
   // Utilidades de navegación
-  static void goBack(BuildContext context) {
-    Navigator.pop(context);
+  static Future<void> goBack(BuildContext context) async {
+    // Si estamos en la pantalla de perfil, verificar el rol antes de volver
+    if (ModalRoute.of(context)?.settings.name == '/profile') {
+      final userData = await StorageService.getUser();
+      final userRole =
+          userData?['rol'] ?? '1'; // Default a pasajero si no hay rol
+
+      if (userRole == '1') {
+        goToPassengerHome(context);
+      } else {
+        goToDriverHome(context);
+      }
+    } else {
+      // Comportamiento normal para otras pantallas
+      Navigator.pop(context);
+    }
   }
 
   static void closeDialog(BuildContext context) {

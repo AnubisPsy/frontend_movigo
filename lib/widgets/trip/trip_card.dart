@@ -20,7 +20,8 @@ class TripCard extends StatelessWidget {
     this.date,
     this.cost,
     this.onAccept,
-    this.type = TripCardType.available, required passengerName,
+    this.type = TripCardType.available,
+    required passengerName,
   });
 
   @override

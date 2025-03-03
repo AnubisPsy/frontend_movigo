@@ -3,6 +3,7 @@ import 'package:movigo_frontend/widgets/common/custom_text_field.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -67,13 +68,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/register');
+                    RouteHelper.goToRegister(context);
                   },
                   child: const Text('¿No tienes cuenta? Regístrate'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/forgot-password');
+                    RouteHelper.goToForgotPassword(context);
                   },
                   child: const Text('¿Olvidaste tu contraseña?'),
                 ),
@@ -97,25 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Guardar el token y datos del usuario
         await StorageService.saveToken(response['token']);
-        final token = await StorageService.getToken();
         await StorageService.saveUser(response['user']);
 
         if (mounted) {
           setState(() => _isLoading = false);
 
-          if (response['user']['rol'] == '1') {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/passenger/home',
-              (route) => false,
-            );
-          } else {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/driver/home',
-              (route) => false,
-            );
-          }
+          // Usar RouteHelper en lugar de Navigator directo
+          RouteHelper.goToHomeBasedOnRole(context, response['user']['rol']);
         }
       } catch (e) {
         setState(() => _isLoading = false);

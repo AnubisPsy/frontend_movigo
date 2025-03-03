@@ -10,10 +10,9 @@ import 'package:movigo_frontend/screens/passenger/passenger_home_screen.dart';
 import 'package:movigo_frontend/screens/passenger/passenger_history_screen.dart';
 
 // Pantallas de conductor
-import 'package:movigo_frontend/screens/driver/driver_home_screen.dart';
-import 'package:movigo_frontend/screens/driver/driver_info_screen.dart';
 import 'package:movigo_frontend/screens/driver/vehicle_info_screen.dart';
 import 'package:movigo_frontend/screens/driver/driver_trip_history_screen.dart';
+import 'package:movigo_frontend/screens/driver/driver_home_screen.dart';
 
 //Pantallas del perfil
 import 'package:movigo_frontend/screens/profile/change_password_screen.dart';
@@ -57,11 +56,10 @@ class MyApp extends StatelessWidget {
         '/passenger/home': (context) => const PassengerHomeScreen(),
         '/passenger/history': (context) => const TripHistoryScreen(),
 
-        // Rutas de conductor
-//        '/driver/home': (context) => const DriverHomeScreen(),
-        '/driver/info': (context) => const DriverInfoScreen(),
+        /// Rutas de conductor
         '/driver/vehicle-info': (context) => const VehicleInfoScreen(),
-//        '/driver/history': (context) => const DriverTripHistoryScreen(),
+        '/driver/home': (context) => const DriverHomeScreen(),
+        '/driver/history': (context) => const DriverTripHistoryScreen(),
       },
       // Manejo de rutas no definidas
       onUnknownRoute: (settings) {
