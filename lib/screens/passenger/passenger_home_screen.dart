@@ -1,3 +1,5 @@
+// Modificaciones a passenger_home_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
@@ -5,6 +7,7 @@ import 'package:movigo_frontend/data/services/passenger_service.dart';
 import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
+import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
 
 class PassengerHomeScreen extends StatefulWidget {
   const PassengerHomeScreen({super.key});
@@ -19,39 +22,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
   bool _isLoading = false;
   Map<String, dynamic>? _activeTrip;
   final PassengerService _passengerService = PassengerService();
-
-  // Variables para el temporizador de cancelación
-  bool _canCancel = true;
-  int _remainingSeconds = 300; // 5 minutos por defecto
-  Timer? _countdownTimer;
   Timer? _refreshTimer;
-
-  // Getter para formatear el tiempo
-  String get _formattedTime {
-    final minutes = _remainingSeconds ~/ 60;
-    final seconds = _remainingSeconds % 60;
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
-  }
-
-  // Método para iniciar el timer de cuenta regresiva
-  void _initializeTimer() {
-    // Cancelar cualquier timer existente
-    _countdownTimer?.cancel();
-
-    // Crear un nuevo timer
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      // Actualizar el estado cada segundo
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _canCancel = false;
-          _countdownTimer?.cancel();
-        }
-      });
-    });
-  }
 
   @override
   void initState() {
@@ -69,7 +40,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     SocketService.off('viaje-cancelado', _handleViajeCancelado);
 
     _refreshTimer?.cancel();
-    _countdownTimer?.cancel();
     _originController.dispose();
     _destinationController.dispose();
     super.dispose();
@@ -99,8 +69,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     if (data != null && mounted) {
       setState(() {
         _activeTrip = Map<String, dynamic>.from(data);
-        _canCancel = false;
-        _countdownTimer?.cancel();
       });
     }
   }
@@ -120,7 +88,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       setState(() {
         _activeTrip =
             null; // Limpiamos el viaje activo para volver al panel de solicitud
-        _countdownTimer?.cancel();
       });
 
       // Mostrar notificación
@@ -142,7 +109,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     if (data != null && mounted) {
       setState(() {
         _activeTrip = null;
-        _countdownTimer?.cancel();
       });
     }
   }
@@ -153,39 +119,105 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     setState(() => _isLoading = true);
 
     try {
+      // Primer intento: buscar en almacenamiento local
       final activeTrip = await _passengerService.getActiveTrip();
 
-      if (!mounted) return;
-
       if (activeTrip != null) {
-        final tiempoCancelacionExpirado =
-            activeTrip['tiempo_cancelacion_expirado'] == true;
-        final estadoViaje = activeTrip['estado'] ?? 1;
+        // Si existe localmente, verificar si sigue existiendo en el servidor
+        final tripId = activeTrip['id'];
+        final serverTrip = await _passengerService.getTripById(tripId);
 
-        setState(() {
-          _activeTrip = activeTrip;
-          _isLoading = false;
-          _canCancel = !tiempoCancelacionExpirado && estadoViaje == 1;
-
-          // Si hay un viaje activo que se puede cancelar, iniciar el timer
-          if (_canCancel) {
-            _remainingSeconds = 300;
-            _initializeTimer();
-          }
+        if (serverTrip != null) {
+          // El viaje sigue existiendo en el servidor
+          setState(() {
+            _activeTrip = serverTrip;
+            _isLoading = false;
+          });
 
           // Iniciar timer de respaldo para actualizaciones
           _startRefreshTimer();
-        });
-      } else {
+          return; // Salir porque ya encontramos un viaje activo
+        }
+      }
+
+      // Si no encontramos nada local o no es válido, hacer consulta directa al servidor
+      final trips = await _passengerService.getTripHistory();
+
+      // Buscar cualquier viaje que esté en estado pendiente(1), aceptado(2) o en curso(3)
+      final pendingTrip = trips.firstWhere(
+        (trip) =>
+            trip['status'] == 1 || trip['status'] == 2 || trip['status'] == 3,
+        orElse: () => <String, dynamic>{},
+      );
+
+      if (pendingTrip.isNotEmpty && pendingTrip['id'] != null) {
+        // Obtener detalles completos del viaje
+        final fullTripDetails =
+            await _passengerService.getTripById(pendingTrip['id']);
+
+        if (fullTripDetails != null) {
+          setState(() {
+            _activeTrip = fullTripDetails;
+            _isLoading = false;
+          });
+
+          // Iniciar timer de respaldo para actualizaciones
+          _startRefreshTimer();
+          return;
+        }
+      }
+
+      // Si no hay viaje activo, limpiar el estado
+      if (mounted) {
         setState(() {
           _activeTrip = null;
           _isLoading = false;
         });
       }
     } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        print('Error al verificar viaje activo: $e');
+      }
+    }
+  }
+
+  void _startRefreshTimer() {
+    // Cancelar cualquier timer anterior
+    _refreshTimer?.cancel();
+
+    // Usar un intervalo más largo (10 segundos) como respaldo a WebSockets
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (mounted) _refreshTripStatus();
+    });
+  }
+
+  Future<void> _refreshTripStatus() async {
+    if (_activeTrip == null || !mounted) return;
+
+    try {
+      print("Consultando estado actual del viaje ID: ${_activeTrip!['id']}");
+      final tripId = _activeTrip!['id'];
+      final updatedTrip = await _passengerService.getTripById(tripId);
+
       if (!mounted) return;
-      setState(() => _isLoading = false);
-      print('Error al verificar viaje activo: $e');
+
+      if (updatedTrip != null) {
+        print(
+            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${updatedTrip['estado']}");
+
+        setState(() {
+          _activeTrip = updatedTrip;
+        });
+      } else {
+        print("El viaje ya no existe o no se pudo obtener");
+        // Si el viaje ya no existe, limpiar estado
+        setState(() {
+          _activeTrip = null;
+        });
+      }
+    } catch (e) {
+      print('Error al actualizar estado del viaje: $e');
     }
   }
 
@@ -211,15 +243,14 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Mapa (placeholder)
+            // Mapa en tiempo real
+            // Mapa en tiempo real
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Text('Mapa aquí'),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: MapaEnTiempoReal(
+                  esViajePendiente: _activeTrip != null,
+                  tripData: _activeTrip,
                 ),
               ),
             ),
@@ -305,9 +336,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                 setState(() {
                   _isLoading = false;
                   _activeTrip = trip;
-                  _canCancel = true;
-                  _remainingSeconds = 300; // 5 minutos
-                  _initializeTimer(); // Iniciar el temporizador para el nuevo viaje
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -381,16 +409,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // Agregar botón de actualización (opcional, puedes quitarlo luego)
-          ElevatedButton(
-            onPressed: () async {
-              print("Actualizando manualmente...");
-              await _refreshTripStatus();
-            },
-            child: const Text('Actualizar estado'),
-          ),
-          const SizedBox(height: 8),
-
           // Información de origen y destino
           Row(
             children: [
@@ -412,17 +430,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
             ],
           ),
 
-          // Si podemos cancelar, mostrar temporizador y botón
-          if (_canCancel) ...[
+          // Solo mostrar el botón de cancelar si está en estado pendiente (1)
+          if (estado == 1) ...[
             const SizedBox(height: 16),
-            Text(
-              'Puedes cancelar en: $_formattedTime',
-              style: TextStyle(
-                color: _remainingSeconds < 60 ? Colors.red : Colors.blue,
-              ),
-            ),
-            Text('Segundos restantes: $_remainingSeconds'),
-            const SizedBox(height: 8),
             CustomButton(
               text: 'Cancelar Viaje',
               onPressed: () async {
@@ -441,7 +451,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     setState(() {
                       _activeTrip = null;
                       _isLoading = false;
-                      _countdownTimer?.cancel();
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -455,7 +464,8 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     setState(() => _isLoading = false);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('No se pudo cancelar el viaje')),
+                        content: Text('No se pudo cancelar el viaje'),
+                      ),
                     );
                   }
                 } catch (e) {
@@ -505,58 +515,5 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         ],
       ),
     );
-  }
-
-  void _startRefreshTimer() {
-    // Cancelar cualquier timer anterior
-    _refreshTimer?.cancel();
-
-    // Usar un intervalo más largo (10 segundos) como respaldo a WebSockets
-    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
-      if (mounted) _refreshTripStatus();
-    });
-  }
-
-  Future<void> _refreshTripStatus() async {
-    if (_activeTrip == null || !mounted) return;
-
-    try {
-      print("Consultando estado actual del viaje ID: ${_activeTrip!['id']}");
-      final tripId = _activeTrip!['id'];
-      final updatedTrip = await _passengerService.getTripById(tripId);
-
-      if (!mounted) return;
-
-      if (updatedTrip != null) {
-        print(
-            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${updatedTrip['estado']}");
-
-        setState(() {
-          _activeTrip = updatedTrip;
-
-          // Actualizar el estado de cancelación
-          bool tiempoCancelacionExpirado =
-              updatedTrip['tiempo_cancelacion_expirado'] == true;
-          int estadoViaje = updatedTrip['estado'] ?? 1;
-
-          // Actualizar si podemos cancelar
-          bool previousCanCancel = _canCancel;
-          _canCancel = !tiempoCancelacionExpirado && estadoViaje == 1;
-
-          // Si el estado de cancelación cambió
-          if (previousCanCancel && !_canCancel) {
-            _countdownTimer?.cancel();
-          }
-        });
-      } else {
-        print("El viaje ya no existe o no se pudo obtener");
-        // Si el viaje ya no existe, limpiar estado
-        setState(() {
-          _activeTrip = null;
-        });
-      }
-    } catch (e) {
-      print('Error al actualizar estado del viaje: $e');
-    }
   }
 }
