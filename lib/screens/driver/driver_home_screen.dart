@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:movigo_frontend/core/constants/api_constants.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/driver_service.dart';
@@ -92,13 +95,72 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     }
   }
 
+  Future<Map<String, dynamic>?> getActiveTrip() async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        print("getActiveTrip: No hay token de autenticación");
+        return null;
+      }
+
+      // Primero obtenemos todos los viajes
+      String url = '${ApiConstants.baseUrl}/viajes';
+      print("getActiveTrip: Consultando ${url}");
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print("getActiveTrip: Código de respuesta ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+
+        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          List<dynamic> tripsList = jsonResponse['data'];
+          print("getActiveTrip: Se encontraron ${tripsList.length} viajes");
+
+          // Filtrar viajes en estado 2 (ACEPTADO) o 3 (EN_CURSO)
+          final activeTrips = tripsList.where((trip) {
+            final estado = trip['estado'];
+            return estado == 2 || estado == 3;
+          }).toList();
+
+          print(
+              "getActiveTrip: Viajes activos filtrados: ${activeTrips.length}");
+
+          if (activeTrips.isNotEmpty) {
+            final activeTrip = activeTrips.first;
+            print(
+                "getActiveTrip: Viaje activo encontrado con ID: ${activeTrip['id']}");
+            return Map<String, dynamic>.from(activeTrip);
+          }
+        }
+      } else {
+        print("Error en getActiveTrip: ${response.statusCode}");
+        print("Respuesta: ${response.body}");
+      }
+
+      print("getActiveTrip: No se encontró ningún viaje activo");
+      return null;
+    } catch (e) {
+      print('Error en getActiveTrip: $e');
+      return null;
+    }
+  }
+
   Future<void> _checkActiveTrip() async {
     if (!mounted) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final activeTrip = await _driverService.getActiveTrip();
+      final activeTrip =
+          await getActiveTrip(); // Usando el método que has implementado
 
       if (!mounted) return;
 
@@ -109,12 +171,28 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       // Si hay un viaje activo, navegar a la pantalla de viaje activo
       if (_activeTrip != null) {
-        RouteHelper.goToDriverActiveTrip(context);
+        print(
+            "Viaje activo encontrado, redirigiendo a pantalla de viaje activo");
+
+        // Usar un pequeño retraso para asegurar que la UI esté lista
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            RouteHelper.goToDriverActiveTrip(context);
+          }
+        });
+      } else {
+        print("No se encontró viaje activo");
+        _loadAvailableTrips(); // Cargar viajes disponibles si no hay activos
       }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
       print('Error al verificar viaje activo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('Error al verificar viajes activos: ${e.toString()}')),
+      );
     }
   }
 
@@ -193,8 +271,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => RouteHelper.goToDriverInfo(context),
-        child: const Icon(Icons.settings),
         tooltip: 'Configuración del conductor',
+        child: const Icon(Icons.settings),
       ),
     );
   }
@@ -390,8 +468,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             CustomButton(
               text: 'Aceptar Viaje',
               onPressed: () {
-                _acceptTrip(trip);
-                Navigator.pop(context);
+                Navigator.pop(context); // Cierra el modal
+                _acceptTrip(trip); // Acepta el viaje y navega
               },
             ),
             const SizedBox(height: 12),
@@ -448,7 +526,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         throw Exception('ID de viaje no disponible');
       }
 
-      await _driverService.acceptTrip(tripId);
+      final updatedTrip = await _driverService.acceptTrip(tripId);
 
       if (!mounted) return;
 
@@ -461,8 +539,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         ),
       );
 
-      // Navegar a la pantalla de viaje activo
-      RouteHelper.goToDriverActiveTrip(context);
+      // Navegar pasando el viaje como argumento
+      Navigator.pushNamed(
+        context,
+        '/driver/active-trip',
+        arguments: updatedTrip, // Pasamos el viaje actualizado como argumento
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);

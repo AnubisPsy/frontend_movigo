@@ -13,6 +13,7 @@ import 'package:movigo_frontend/screens/passenger/passenger_history_screen.dart'
 import 'package:movigo_frontend/screens/driver/vehicle_info_screen.dart';
 import 'package:movigo_frontend/screens/driver/driver_trip_history_screen.dart';
 import 'package:movigo_frontend/screens/driver/driver_home_screen.dart';
+import 'package:movigo_frontend/screens/driver/driver_active_trip_screen.dart';
 
 //Pantallas del perfil
 import 'package:movigo_frontend/screens/profile/change_password_screen.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         '/driver/vehicle-info': (context) => const VehicleInfoScreen(),
         '/driver/home': (context) => const DriverHomeScreen(),
         '/driver/history': (context) => const DriverTripHistoryScreen(),
+        '/driver/active-trip': (context) => const DriverActiveTripScreen(),
       },
       // Manejo de rutas no definidas
       onUnknownRoute: (settings) {

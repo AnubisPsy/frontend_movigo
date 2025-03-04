@@ -24,8 +24,8 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
   final List<Marker> _markers = [];
 
   LatLng _currentPosition =
-      LatLng(14.0723, -87.1921); // Posición por defecto (Tegucigalpa)
-  List<LatLng> _positionHistory = [];
+      const LatLng(14.0723, -87.1921); // Posición por defecto (Tegucigalpa)
+  final List<LatLng> _positionHistory = [];
   bool _isLoading = true;
 
   @override

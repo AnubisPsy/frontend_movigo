@@ -4,6 +4,7 @@ import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import 'package:movigo_frontend/data/services/passenger_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -103,8 +104,28 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
 
-          // Usar RouteHelper en lugar de Navigator directo
-          RouteHelper.goToHomeBasedOnRole(context, response['user']['rol']);
+          // Verificar si el usuario es un pasajero
+          if (response['user']['rol'] == '1') {
+            final passengerService = PassengerService();
+            final activeTrip = await passengerService.getActiveTrip();
+
+            // Solo considerar un viaje como activo si su estado es 1 (PENDIENTE), 2 (ACEPTADO) o 3 (EN_CURSO)
+            // Los estados 4 (COMPLETADO) y 5 (CANCELADO) no son activos
+            if (activeTrip != null &&
+                (activeTrip['estado'] == 1 ||
+                    activeTrip['estado'] == 2 ||
+                    activeTrip['estado'] == 3)) {
+              // Si hay un viaje activo, mantener en la pantalla del viaje
+              RouteHelper.goToPassengerHome(context);
+              return;
+            } else {
+              // Si no hay viaje activo o el viaje está completado/cancelado, ir al home
+              RouteHelper.goToPassengerHome(context);
+            }
+          } else {
+            // Para conductores, usar la redirección normal
+            RouteHelper.goToHomeBasedOnRole(context, response['user']['rol']);
+          }
         }
       } catch (e) {
         setState(() => _isLoading = false);

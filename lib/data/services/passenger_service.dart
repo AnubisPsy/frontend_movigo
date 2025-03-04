@@ -156,64 +156,63 @@ class PassengerService {
   // Verificar si hay un viaje activo
   Future<Map<String, dynamic>?> getActiveTrip() async {
     try {
-      // Verificar primero en el almacenamiento local
+      // Obtener del almacenamiento local
       final prefs = await SharedPreferences.getInstance();
       final tripJson = prefs.getString('active_trip');
 
-      // También intentar obtener directamente del servidor
-      final token = await StorageService.getToken();
-      if (token == null) {
-        return null;
-      }
-
-      // Obtener historial de viajes del usuario
-      String historyUrl = '${ApiConstants.baseUrl}${ApiConstants.tripHistory}';
-
-      final historyResponse = await http.get(
-        Uri.parse(historyUrl),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (historyResponse.statusCode == 200) {
-        final historyData = jsonDecode(historyResponse.body);
-        if (historyData['success'] == true && historyData['data'] != null) {
-          List<dynamic> tripsList = historyData['data'];
-
-          // Buscar viajes activos (estados 1, 2 o 3)
-          final activeTrips = tripsList.where((trip) {
-            final status = trip['estado_id'] ?? 0;
-            return status == 1 ||
-                status == 2 ||
-                status == 3; // Pendiente, Aceptado o En Curso
-          }).toList();
-
-          if (activeTrips.isNotEmpty) {
-            // Encontramos un viaje activo en el servidor
-            final serverTrip = activeTrips.first;
-
-            // Actualizar almacenamiento local
-            await _saveActiveTrip(serverTrip);
-            return serverTrip;
-          }
-        }
-      }
-
-      // Si no encontramos nada en el servidor pero tenemos local, devolver local
       if (tripJson != null) {
         try {
-          final localTrip = jsonDecode(tripJson);
-          return localTrip;
+          final tripData = jsonDecode(tripJson);
+
+          // Opcional: Verificar estado actual del viaje
+          final tripId = tripData['id'];
+          if (tripId != null) {
+            try {
+              final updatedTrip = await _checkTripStatus(tripId);
+              if (updatedTrip != null) {
+                // Si el viaje fue completado o cancelado, limpiar almacenamiento
+                if (updatedTrip['estado'] == 4 || updatedTrip['estado'] == 5) {
+                  await _removeActiveTrip();
+                  return null;
+                }
+
+                // Solo devolver el viaje si está en estado activo (1, 2 o 3)
+                if (updatedTrip['estado'] >= 1 && updatedTrip['estado'] <= 3) {
+                  // Actualizar el almacenamiento con datos frescos
+                  await _saveActiveTrip(updatedTrip);
+                  return updatedTrip;
+                }
+
+                // Si el estado no es activo, limpiar y devolver null
+                await _removeActiveTrip();
+                return null;
+              }
+            } catch (e) {
+              print("Error al verificar estado: $e");
+              // Limpiar datos potencialmente obsoletos
+              await _removeActiveTrip();
+              return null;
+            }
+          }
+
+          // Verificar estado del viaje antes de devolverlo
+          if (tripData['estado'] >= 1 && tripData['estado'] <= 3) {
+            return tripData;
+          } else {
+            // Si no es un estado activo, limpiar y devolver null
+            await _removeActiveTrip();
+            return null;
+          }
         } catch (e) {
-          print("Error al decodificar trip JSON: $e");
+          print("Error al decodificar viaje: $e");
+          await _removeActiveTrip();
+          return null;
         }
       }
 
       return null;
     } catch (e) {
-      print('Error completo en getActiveTrip: $e');
+      print('Error en getActiveTrip: $e');
       return null;
     }
   }

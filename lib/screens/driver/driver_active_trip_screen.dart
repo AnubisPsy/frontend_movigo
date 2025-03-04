@@ -5,6 +5,7 @@ import 'package:movigo_frontend/data/services/driver_service.dart';
 import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
+import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
 
 class DriverActiveTripScreen extends StatefulWidget {
   const DriverActiveTripScreen({super.key});
@@ -23,6 +24,18 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
   void initState() {
     super.initState();
     _loadActiveTrip();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final tripArg = ModalRoute.of(context)?.settings.arguments;
+      if (tripArg != null && tripArg is Map<String, dynamic>) {
+        setState(() {
+          _activeTrip = tripArg;
+          _isLoading = false;
+        });
+        _startRefreshTimer();
+      } else {
+        _loadActiveTrip(); // Si no hay argumento, intentar cargar normalmente
+      }
+    });
     _initializeWebSocket();
   }
 
@@ -30,7 +43,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
   void dispose() {
     // Remover listeners al salir de la pantalla
     SocketService.off('viaje-cancelado', _handleViajeCancelado);
-    
+
     _refreshTimer?.cancel();
     super.dispose();
   }
@@ -92,24 +105,21 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
       // Si no hay viaje activo, volver a la pantalla principal
       if (_activeTrip == null) {
+        // ← ESTE ES EL PROBLEMA
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No tienes viajes activos'),
             backgroundColor: Colors.orange,
           ),
         );
-        RouteHelper.goToDriverHome(context);
+        RouteHelper.goToDriverHome(
+            context); // ← ESTA REDIRECCIÓN ES LA QUE TE MANDA AL HOME
       } else {
         // Iniciar timer de refresco para actualizaciones
         _startRefreshTimer();
       }
     } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      print('Error al cargar viaje activo: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      // ...
     }
   }
 
@@ -216,16 +226,22 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Viaje Activo'),
-        automaticallyImplyLeading: false, // Evitar botón de retroceso
+    return WillPopScope(
+      onWillPop: () async {
+        // No permitir volver atrás con el botón físico
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Viaje Activo'),
+          automaticallyImplyLeading: false, // Evitar botón de retroceso
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _activeTrip == null
+                ? const Center(child: Text('No hay viaje activo'))
+                : _buildTripDetails(),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _activeTrip == null
-              ? const Center(child: Text('No hay viaje activo'))
-              : _buildTripDetails(),
     );
   }
 
@@ -258,14 +274,13 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       child: Column(
         children: [
           // Área del mapa (placeholder)
+          // En _buildTripDetails, reemplaza el placeholder del mapa con un componente real
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text('Mapa aquí'),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: MapaEnTiempoReal(
+                esViajePendiente: true,
+                tripData: _activeTrip,
               ),
             ),
           ),

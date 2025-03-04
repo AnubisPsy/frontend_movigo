@@ -86,30 +86,26 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     print('📱 Viaje completado recibido: $data');
     if (data != null && mounted) {
       setState(() {
-        _activeTrip =
-            null; // Limpiamos el viaje activo para volver al panel de solicitud
+        _activeTrip = null; // Limpiamos el viaje activo
+        _refreshTimer?.cancel(); // Detener el timer de actualización
       });
 
-      // Mostrar notificación
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('¡Tu viaje ha finalizado!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
-
-      // Navegar al home del pasajero usando RouteHelper
-      RouteHelper.goToPassengerHome(context);
+      // Mostrar diálogo de viaje completado
+      _showCompletedDialog();
     }
   }
 
+// Método actualizado para manejar viaje cancelado
   void _handleViajeCancelado(dynamic data) {
     print('📱 Viaje cancelado recibido: $data');
     if (data != null && mounted) {
       setState(() {
         _activeTrip = null;
+        _refreshTimer?.cancel(); // Detener el timer de actualización
       });
+
+      // Mostrar diálogo de viaje cancelado
+      _showCanceledDialog();
     }
   }
 
@@ -244,7 +240,6 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         child: Column(
           children: [
             // Mapa en tiempo real
-            // Mapa en tiempo real
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -265,6 +260,46 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               _buildRequestTripPanel(),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCompletedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Viaje Completado'),
+        content: const Text('Tu viaje ha sido completado exitosamente.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Cerrar el diálogo
+              RouteHelper.goToPassengerHome(context); // Redirigir al home
+            },
+            child: const Text('Aceptar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCanceledDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Viaje Cancelado'),
+        content: const Text('Tu viaje ha sido cancelado.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Cerrar el diálogo
+              RouteHelper.goToPassengerHome(context); // Redirigir al home
+            },
+            child: const Text('Aceptar'),
+          ),
+        ],
       ),
     );
   }
@@ -433,6 +468,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           // Solo mostrar el botón de cancelar si está en estado pendiente (1)
           if (estado == 1) ...[
             const SizedBox(height: 16),
+            // Modificación para el método de cancelar viaje en el pasajero
             CustomButton(
               text: 'Cancelar Viaje',
               onPressed: () async {
@@ -451,21 +487,17 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     setState(() {
                       _activeTrip = null;
                       _isLoading = false;
+                      _refreshTimer
+                          ?.cancel(); // Detener el timer de actualización
                     });
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('¡Viaje cancelado con éxito!'),
-                        backgroundColor: Colors.green,
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
+                    // Mostrar diálogo después de cancelar el viaje exitosamente
+                    _showCanceledDialog();
                   } else {
                     setState(() => _isLoading = false);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('No se pudo cancelar el viaje'),
-                      ),
+                          content: Text('No se pudo cancelar el viaje')),
                     );
                   }
                 } catch (e) {

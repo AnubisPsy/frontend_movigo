@@ -182,10 +182,15 @@ class DriverService {
             return estado == 2 || estado == 3;
           }).toList();
 
+          print("Viajes activos encontrados: ${activeTrips.length}");
+
           if (activeTrips.isNotEmpty) {
             return Map<String, dynamic>.from(activeTrips.first);
           }
         }
+      } else {
+        print("Error en getActiveTrip: ${response.statusCode}");
+        print("Respuesta: ${response.body}");
       }
 
       return null;

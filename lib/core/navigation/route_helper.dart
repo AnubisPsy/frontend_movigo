@@ -108,10 +108,6 @@ class RouteHelper {
     );
   }
 
-  static void goToDriverActiveTrip(BuildContext context) {
-    Navigator.pushNamed(context, '/driver/active-trip');
-  }
-
   // Utilidades de navegación
   static Future<void> goBack(BuildContext context) async {
     // Si estamos en la pantalla de perfil, verificar el rol antes de volver
@@ -141,5 +137,14 @@ class RouteHelper {
     } else {
       goToDriverHome(context);
     }
+  }
+
+// En route_helper.dart
+  static void goToDriverActiveTrip(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/driver/active-trip',
+      (route) => false,
+    );
   }
 }
