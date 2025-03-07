@@ -46,6 +46,40 @@ class DriverService {
     }
   }
 
+  // Añade este método a la clase DriverService
+  Future<Map<String, dynamic>?> getTripById(String tripId) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        return null;
+      }
+
+      String url = '${ApiConstants.baseUrl}/viajes/$tripId';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true && jsonResponse['data'] != null) {
+          return Map<String, dynamic>.from(jsonResponse['data']);
+        }
+      } else {
+        print("Error al obtener viaje: ${response.statusCode}");
+        print("Respuesta: ${response.body}");
+      }
+      return null;
+    } catch (e) {
+      print('Error en getTripById: $e');
+      return null;
+    }
+  }
+
   // Aceptar un viaje
   Future<Map<String, dynamic>> acceptTrip(String tripId) async {
     try {

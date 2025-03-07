@@ -18,13 +18,27 @@ class DriverHomeScreen extends StatefulWidget {
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   final DriverService _driverService = DriverService();
   bool _isLoading = false;
+  bool _redirectingToActiveTrip = false;
+  bool _suppressRedirection = false;
+
   List<Map<String, dynamic>> _availableTrips = [];
   Map<String, dynamic>? _activeTrip;
 
   @override
   void initState() {
     super.initState();
-    _checkActiveTrip();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map<String, dynamic> &&
+          args['fromActiveTripScreen'] == true) {
+        // Si venimos de la pantalla de viaje activo, no redireccionar de vuelta
+        _suppressRedirection = true;
+      }
+
+      _checkActiveTrip(); // Una sola llamada aquí
+    });
+
     _loadAvailableTrips();
     _initializeWebSocket();
   }
@@ -154,13 +168,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   }
 
   Future<void> _checkActiveTrip() async {
-    if (!mounted) return;
+    if (!mounted || _redirectingToActiveTrip) return;
 
     setState(() => _isLoading = true);
 
     try {
-      final activeTrip =
-          await getActiveTrip(); // Usando el método que has implementado
+      final activeTrip = await _driverService.getActiveTrip();
 
       if (!mounted) return;
 
@@ -169,20 +182,23 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         _isLoading = false;
       });
 
-      // Si hay un viaje activo, navegar a la pantalla de viaje activo
-      if (_activeTrip != null) {
+      // Solo redireccionar si hay un viaje activo Y no estamos suprimiendo la redirección
+      if (_activeTrip != null && !_suppressRedirection) {
         print(
             "Viaje activo encontrado, redirigiendo a pantalla de viaje activo");
 
+        // Marcar que ya estamos redirigiendo para evitar múltiples redirecciones
+        _redirectingToActiveTrip = true;
+
         // Usar un pequeño retraso para asegurar que la UI esté lista
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            RouteHelper.goToDriverActiveTrip(context);
-          }
-        });
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        if (mounted) {
+          RouteHelper.goToDriverActiveTrip(context);
+        }
       } else {
-        print("No se encontró viaje activo");
-        _loadAvailableTrips(); // Cargar viajes disponibles si no hay activos
+        print("No se encontró viaje activo o redirección suprimida");
+        _loadAvailableTrips(); // Cargar viajes disponibles
       }
     } catch (e) {
       if (!mounted) return;
@@ -252,7 +268,60 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       ),
       body: Column(
         children: [
-          // Botón de actualizar prominente en la parte superior
+          // Banner de viaje activo (solo visible si hay un viaje activo)
+          if (_activeTrip != null)
+            GestureDetector(
+              onTap: () {
+                RouteHelper.goToDriverActiveTrip(
+                    context); // Usar el RouteHelper en lugar de Navigator
+              },
+              child: Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                color: Colors.green.shade700,
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.directions_car,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Viaje Activo',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (_activeTrip != null &&
+                              _activeTrip!['destino'] != null)
+                            Text(
+                              'Destino: ${_activeTrip!['destino']}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // Botón de actualizar (y resto del contenido original)
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: CustomButton(
@@ -261,12 +330,37 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               onPressed: _loadAvailableTrips,
             ),
           ),
-          // Resto del contenido
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _buildBody(),
           ),
+          // Dentro del Column del body
+          if (_activeTrip != null)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade100,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.shade700),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.directions_car, color: Colors.green),
+                title: const Text('Viaje Activo',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(
+                  'Destino: ${_activeTrip?['destino'] ?? 'No disponible'}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: ElevatedButton(
+                  onPressed: () {
+                    RouteHelper.goToDriverActiveTrip(context);
+                  },
+                  child: const Text('Ver'),
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -530,7 +624,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       if (!mounted) return;
 
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _activeTrip = updatedTrip; // Establecer el viaje activo
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -539,11 +636,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         ),
       );
 
-      // Navegar pasando el viaje como argumento
-      Navigator.pushNamed(
+      // Navegar directamente sin argumentos adicionales
+      Navigator.pushNamedAndRemoveUntil(
         context,
         '/driver/active-trip',
-        arguments: updatedTrip, // Pasamos el viaje actualizado como argumento
+        (route) => false,
+        arguments: updatedTrip,
       );
     } catch (e) {
       if (!mounted) return;

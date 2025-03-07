@@ -140,11 +140,13 @@ class RouteHelper {
   }
 
 // En route_helper.dart
-  static void goToDriverActiveTrip(BuildContext context) {
+  static void goToDriverActiveTrip(BuildContext context,
+      {Map<String, dynamic>? arguments}) {
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/driver/active-trip',
       (route) => false,
+      arguments: arguments,
     );
   }
 }
