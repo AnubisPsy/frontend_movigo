@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.0
+  http: 0.13.6
   supabase_flutter: ^2.3.3
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.2.2
@@ -39,9 +39,10 @@ dependencies:
   intl: ^0.18.1
   socket_io_client: ^2.0.0
 
-  flutter_map: ^5.0.0  # Biblioteca para mostrar mapas de Mapbox
-  latlong2: ^0.9.0     # Manejo de coordenadas de latitud y longitud
-  geolocator: ^10.1.0  # Ya lo tienes para obtener ubicación
+  # Añadir estas dependencias para el mapa
+  flutter_map: ^3.1.0
+  latlong2: ^0.8.1
+  geolocator: ^9.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

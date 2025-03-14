@@ -24,7 +24,7 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
   final List<Marker> _markers = [];
 
   LatLng _currentPosition =
-      const LatLng(14.0723, -87.1921); // Posición por defecto (Tegucigalpa)
+      LatLng(14.0723, -87.1921); // Posición por defecto (Tegucigalpa)
   final List<LatLng> _positionHistory = [];
   bool _isLoading = true;
 
@@ -140,12 +140,10 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
         width: 40.0,
         height: 40.0,
         point: _currentPosition,
-        builder: (ctx) => Container(
-          child: const Icon(
-            Icons.location_on,
-            color: Colors.blue,
-            size: 40.0,
-          ),
+        builder: (ctx) => const Icon(
+          Icons.location_on,
+          color: Colors.blue,
+          size: 40.0,
         ),
       ),
     );
@@ -164,12 +162,10 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
           width: 40.0,
           height: 40.0,
           point: origen,
-          builder: (ctx) => Container(
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.green,
-              size: 40.0,
-            ),
+          builder: (ctx) => const Icon(
+            Icons.location_on,
+            color: Colors.green,
+            size: 40.0,
           ),
         ),
       );
@@ -179,12 +175,10 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
           width: 40.0,
           height: 40.0,
           point: destino,
-          builder: (ctx) => Container(
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.red,
-              size: 40.0,
-            ),
+          builder: (ctx) => const Icon(
+            Icons.location_on,
+            color: Colors.red,
+            size: 40.0,
           ),
         ),
       );
@@ -207,7 +201,6 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.movigo.app',
-          // OpenStreetMap es gratuito, pero es buena práctica identificar tu app
         ),
         MarkerLayer(markers: _markers),
         if (_positionHistory.length > 1)

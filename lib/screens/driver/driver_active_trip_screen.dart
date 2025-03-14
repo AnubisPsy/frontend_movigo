@@ -1,3 +1,4 @@
+// lib/screens/driver/driver_active_trip_screen.dart
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
@@ -19,24 +20,53 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
   bool _isLoading = false;
   Map<String, dynamic>? _activeTrip;
   Timer? _refreshTimer;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _loadActiveTrip();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final tripArg = ModalRoute.of(context)?.settings.arguments;
-      if (tripArg != null && tripArg is Map<String, dynamic>) {
-        setState(() {
-          _activeTrip = tripArg;
-          _isLoading = false;
-        });
-        _startRefreshTimer();
-      } else {
-        _loadActiveTrip(); // Si no hay argumento, intentar cargar normalmente
-      }
-    });
     _initializeWebSocket();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Evitamos inicializar múltiples veces
+    if (!_initialized) {
+      _initialized = true;
+      _initializeTrip();
+    }
+  }
+
+  void _goToHome() {
+    // Navegar al home indicando que venimos de la pantalla de viaje activo
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/driver/home',
+      (route) => false,
+      arguments: {'fromActiveTripScreen': true},
+    );
+  }
+
+  void _initializeTrip() {
+    // Intentar obtener el viaje de los argumentos
+    final tripArg = ModalRoute.of(context)?.settings.arguments;
+
+    if (tripArg != null && tripArg is Map<String, dynamic>) {
+      // Si hay un viaje en los argumentos, usarlo directamente
+      setState(() {
+        _activeTrip = tripArg;
+        _isLoading = false;
+      });
+
+      print("Viaje encontrado en argumentos: ${_activeTrip?['id']}");
+      _startRefreshTimer();
+    } else {
+      // Si no hay argumentos, intentar cargar desde el API
+      print("No se encontró viaje en argumentos, intentando cargar desde API");
+      _loadActiveTrip();
+    }
   }
 
   @override
@@ -96,6 +126,9 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
     try {
       final activeTrip = await _driverService.getActiveTrip();
 
+      print(
+          "Resultado de getActiveTrip: ${activeTrip != null ? 'Viaje encontrado' : 'No hay viaje activo'}");
+
       if (!mounted) return;
 
       setState(() {
@@ -103,23 +136,24 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
         _isLoading = false;
       });
 
-      // Si no hay viaje activo, volver a la pantalla principal
-      if (_activeTrip == null) {
-        // ← ESTE ES EL PROBLEMA
+      // Si hay viaje activo, iniciar timer de refresco
+      if (_activeTrip != null) {
+        _startRefreshTimer();
+      } else {
+        // Si no hay viaje, mostrar mensaje y opción para volver
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No tienes viajes activos'),
             backgroundColor: Colors.orange,
           ),
         );
-        RouteHelper.goToDriverHome(
-            context); // ← ESTA REDIRECCIÓN ES LA QUE TE MANDA AL HOME
-      } else {
-        // Iniciar timer de refresco para actualizaciones
-        _startRefreshTimer();
       }
     } catch (e) {
-      // ...
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar viaje: ${e.toString()}')),
+      );
     }
   }
 
@@ -138,22 +172,42 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
     try {
       final tripId = _activeTrip!['id'];
-      // Aquí deberías implementar un método para obtener el estado actual del viaje
-      // Por ahora, simplemente recargamos el viaje activo
-      final updatedTrip = await _driverService.getActiveTrip();
+
+      print("Refrescando estado del viaje ID: $tripId");
+
+      // Obtener el estado actual del viaje mediante una llamada específica
+      // en lugar de usar getActiveTrip que podría dar falsos negativos
+      final response = await _driverService.getTripById(tripId);
 
       if (!mounted) return;
 
-      if (updatedTrip != null) {
+      if (response != null) {
+        print(
+            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${response['estado']}");
+
         setState(() {
-          _activeTrip = updatedTrip;
+          _activeTrip = response;
         });
-      } else {
-        // Si ya no hay viaje activo (completado o cancelado)
-        setState(() {
-          _activeTrip = null;
-        });
-        RouteHelper.goToDriverHome(context);
+
+        // Si el viaje ya fue completado o cancelado (estados 4 o 5)
+        if (response['estado'] == 4 || response['estado'] == 5) {
+          _refreshTimer?.cancel();
+
+          if (response['estado'] == 4) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Viaje completado'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Navegar de vuelta al home solo si el viaje fue completado
+            await Future.delayed(const Duration(seconds: 2));
+            if (mounted) {
+              RouteHelper.goToDriverHome(context);
+            }
+          }
+        }
       }
     } catch (e) {
       print('Error al actualizar estado del viaje: $e');
@@ -167,6 +221,8 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
     try {
       final tripId = _activeTrip!['id'];
+      print("Iniciando viaje ID: $tripId");
+
       final updatedTrip = await _driverService.startTrip(tripId);
 
       if (!mounted) return;
@@ -198,6 +254,8 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
     try {
       final tripId = _activeTrip!['id'];
+      print("Completando viaje ID: $tripId");
+
       await _driverService.completeTrip(tripId);
 
       if (!mounted) return;
@@ -214,7 +272,10 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       );
 
       // Navegar de regreso a la pantalla principal
-      RouteHelper.goToDriverHome(context);
+      await Future.delayed(const Duration(seconds: 1));
+      if (mounted) {
+        RouteHelper.goToDriverHome(context);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -235,12 +296,68 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
         appBar: AppBar(
           title: const Text('Viaje Activo'),
           automaticallyImplyLeading: false, // Evitar botón de retroceso
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Volver al inicio'),
+                    content: const Text(
+                        '¿Seguro que deseas regresar al inicio? Se mantendrá el viaje activo.'),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.home),
+                        onPressed: _goToHome,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _activeTrip == null
-                ? const Center(child: Text('No hay viaje activo'))
+                ? _buildNoActiveTrip()
                 : _buildTripDetails(),
+      ),
+    );
+  }
+
+  Widget _buildNoActiveTrip() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.directions_car_outlined,
+            size: 64,
+            color: Colors.grey,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No hay viaje activo',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'No se encontró ningún viaje en estado activo',
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 24),
+          CustomButton(
+            text: 'Volver al inicio',
+            onPressed: () => RouteHelper.goToDriverHome(context),
+          ),
+        ],
       ),
     );
   }
@@ -273,8 +390,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Área del mapa (placeholder)
-          // En _buildTripDetails, reemplaza el placeholder del mapa con un componente real
+          // Área del mapa
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
