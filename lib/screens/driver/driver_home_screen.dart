@@ -7,6 +7,7 @@ import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/driver_service.dart';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
+import 'package:movigo_frontend/screens/driver/driver_negotiation_screen.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -415,6 +416,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       itemCount: _availableTrips.length,
       itemBuilder: (context, index) {
         final trip = _availableTrips[index];
+
+        // Mostrar si tiene precio propuesto
+        final tienePrecioPropuesto = trip['estado_negociacion'] == 'propuesto';
+        final precioPropuesto = trip['precio_propuesto']?.toString() ?? '0.00';
+
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
           elevation: 3,
@@ -448,13 +454,25 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                         ),
                       ),
                       const Spacer(),
-                      Text(
-                        'L. ${(trip['tarifa'] ?? 0.0).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+
+                      // Mostrar precio propuesto si existe
+                      if (tienePrecioPropuesto)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'L. $precioPropuesto',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -495,13 +513,24 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                         style: const TextStyle(fontSize: 14),
                       ),
                       const Spacer(),
-                      SizedBox(
-                        height: 36,
-                        child: ElevatedButton(
-                          onPressed: () => _acceptTrip(trip),
-                          child: const Text('Aceptar'),
+
+                      // Botón según si hay precio propuesto o no
+                      if (tienePrecioPropuesto)
+                        SizedBox(
+                          height: 36,
+                          child: ElevatedButton(
+                            onPressed: () => _navegarANegociacion(trip),
+                            child: const Text('Negociar'),
+                          ),
+                        )
+                      else
+                        SizedBox(
+                          height: 36,
+                          child: ElevatedButton(
+                            onPressed: () => _acceptTrip(trip),
+                            child: const Text('Aceptar'),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -513,7 +542,22 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     );
   }
 
+  void _navegarANegociacion(Map<String, dynamic> trip) {
+    // Asegúrate de que el ID se imprime para depuración
+    print('Viaje a negociar: ID=${trip['id']}');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DriverNegotiationScreen(tripData: trip),
+      ),
+    );
+  }
+
   void _showTripDetails(Map<String, dynamic> trip) {
+    final tienePrecioPropuesto = trip['estado_negociacion'] == 'propuesto';
+    final precioPropuesto = trip['precio_propuesto']?.toString() ?? '0.00';
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -542,6 +586,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                 children: [
                   _buildDetailRow('Estado:', 'PENDIENTE'),
                   const Divider(),
+
+                  // Mostrar precio propuesto si existe
+                  if (tienePrecioPropuesto) ...[
+                    _buildDetailRow('Precio propuesto:', 'L. $precioPropuesto'),
+                    const Divider(),
+                  ],
+
                   _buildDetailRow('Origen:', trip['origen'] ?? 'No disponible'),
                   const Divider(),
                   _buildDetailRow(
@@ -552,20 +603,29 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       trip['Usuario'] != null
                           ? '${trip['Usuario']['nombre']} ${trip['Usuario']['apellido']}'
                           : 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow('Tarifa:',
-                      'L. ${(trip['tarifa'] ?? 0.0).toStringAsFixed(2)}'),
                 ],
               ),
             ),
             const Spacer(),
-            CustomButton(
-              text: 'Aceptar Viaje',
-              onPressed: () {
-                Navigator.pop(context); // Cierra el modal
-                _acceptTrip(trip); // Acepta el viaje y navega
-              },
-            ),
+
+            // Botón según si hay precio propuesto o no
+            if (tienePrecioPropuesto)
+              CustomButton(
+                text: 'Negociar Precio',
+                onPressed: () {
+                  Navigator.pop(context); // Cierra el modal
+                  _navegarANegociacion(trip); // Navega a negociación
+                },
+              )
+            else
+              CustomButton(
+                text: 'Aceptar Viaje',
+                onPressed: () {
+                  Navigator.pop(context); // Cierra el modal
+                  _acceptTrip(trip); // Acepta el viaje y navega
+                },
+              ),
+
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () => Navigator.pop(context),

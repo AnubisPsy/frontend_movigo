@@ -412,6 +412,15 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   }
 
   void _showTripDetails(Map<String, dynamic> trip) {
+    // Extraer datos importantes
+    final origen = trip['origin'] ?? 'No disponible';
+    final destino = trip['destination'] ?? 'No disponible';
+    final fecha = trip['date'] ?? DateTime.now();
+    final costo = trip['cost'] ?? 0.0;
+    final driverName = trip['driverName'] ?? 'No disponible';
+    final vehicleInfo = trip['vehicleInfo'] ?? 'No disponible';
+    final estado = trip['statusName'] ?? 'Desconocido';
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -429,55 +438,115 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            TripCard(
-              origin: trip['origin'],
-              destination: trip['destination'],
-              date: trip['date'],
-              driverName: trip['driverName'],
-              vehicleInfo: trip['vehicleInfo'],
-              cost: trip['cost'],
-              type: TripCardType.history,
-              passengerName: null,
-            ),
-            const SizedBox(height: 16),
-            // Detalles adicionales del viaje
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+
+            // Wrap most of the content in Expanded + SingleChildScrollView
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Estado del viaje
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(trip['status']),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        estado,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Detalles principales
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildDetailRow('Fecha:',
+                                DateFormat('dd/MM/yyyy').format(fecha)),
+                            const Divider(),
+                            _buildDetailRow(
+                                'Hora:', DateFormat('HH:mm').format(fecha)),
+                            const Divider(),
+                            _buildDetailRow('Origen:', origen),
+                            const Divider(),
+                            _buildDetailRow('Destino:', destino),
+                            const Divider(),
+                            _buildDetailRow('Costo:',
+                                'L. ${(costo is String ? double.tryParse(costo) ?? 0.0 : (costo is num ? costo : 0.0)).toStringAsFixed(2)}'),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Información del conductor
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Conductor',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildDetailRow('Nombre:', driverName),
+                            const Divider(),
+                            _buildDetailRow('Vehículo:', vehicleInfo),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDetailRow('Fecha:',
-                      DateFormat('dd/MM/yyyy HH:mm').format(trip['date'])),
-                  const Divider(),
-                  _buildDetailRow('Origen:', trip['origin']),
-                  const Divider(),
-                  _buildDetailRow('Destino:', trip['destination']),
-                  const Divider(),
-                  _buildDetailRow('Conductor:', trip['driverName']),
-                  const Divider(),
-                  _buildDetailRow('Vehículo:', trip['vehicleInfo']),
-                  const Divider(),
-                  _buildDetailRow(
-                      'Costo:', '\$${trip['cost'].toStringAsFixed(2)}'),
-                ],
-              ),
             ),
-            const Spacer(),
-            CustomButton(
-              text: 'Reportar Problema',
-              onPressed: () {
-                // Implementar reporte de problema
-                Navigator.pop(context);
-              },
+
+            // Button at the bottom
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('Cerrar'),
             ),
           ],
         ),
       ),
     );
+  }
+
+// Método auxiliar para determinar colores según el estado
+  Color _getStatusColor(int? status) {
+    switch (status) {
+      case 1:
+        return Colors.orange; // PENDIENTE
+      case 2:
+        return Colors.blue; // ACEPTADO
+      case 3:
+        return Colors.amber; // EN CURSO
+      case 4:
+        return Colors.green; // COMPLETADO
+      case 5:
+        return Colors.red; // CANCELADO
+      default:
+        return Colors.grey; // Desconocido
+    }
   }
 
   Widget _buildDetailRow(String label, String value) {
@@ -490,9 +559,9 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black54,
+                color: Colors.grey[700],
               ),
             ),
           ),
@@ -500,7 +569,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             child: Text(
               value,
               style: const TextStyle(
-                color: Colors.black87,
+                fontSize: 16,
               ),
             ),
           ),

@@ -521,36 +521,28 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
   }
 
   void _showTripDetails(Map<String, dynamic> trip) {
-    // Formatear la fecha
-    final tripDate = DateTime.parse(
-        trip['fecha_creacion'] ?? DateTime.now().toIso8601String());
+    // Extraer datos importantes
+    final origen = trip['origen'] ?? 'No disponible';
+    final destino = trip['destino'] ?? 'No disponible';
+    final fecha =
+        trip['fecha'] != null ? DateTime.parse(trip['fecha']) : DateTime.now();
 
-    // Obtener el estado del viaje
-    String statusText = 'Desconocido';
-    Color statusColor = Colors.grey;
+    // Extraer hora_inicio y hora_fin si existen
+    final horaInicio = trip['hora_inicio'] ?? 'No disponible';
+    final horaFin = trip['hora_fin'] ?? 'No disponible';
 
-    switch (trip['estado']) {
-      case 1:
-        statusText = 'PENDIENTE';
-        statusColor = Colors.orange;
-        break;
-      case 2:
-        statusText = 'ACEPTADO';
-        statusColor = Colors.blue;
-        break;
-      case 3:
-        statusText = 'EN CURSO';
-        statusColor = Colors.amber;
-        break;
-      case 4:
-        statusText = 'COMPLETADO';
-        statusColor = Colors.green;
-        break;
-      case 5:
-        statusText = 'CANCELADO';
-        statusColor = Colors.red;
-        break;
-    }
+    // Manejo seguro del costo
+    final costo = trip['costo'] ?? 0.0;
+    final costoNumerico = costo is String
+        ? double.tryParse(costo) ?? 0.0
+        : (costo is num ? costo : 0.0);
+
+    // Información del pasajero
+    final pasajeroNombre = trip['pasajero'] ?? 'No disponible';
+
+    // Estado del viaje
+    final estadoId = trip['estado_id'] ?? 0;
+    final estadoTexto = trip['estado'] ?? 'Desconocido';
 
     showModalBottomSheet(
       context: context,
@@ -569,69 +561,88 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          statusText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+
+            // Wrap most of the content in Expanded + SingleChildScrollView
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Estado del viaje
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(estadoId),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        estadoTexto,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDetailRow('Fecha:',
-                      DateFormat('dd/MM/yyyy HH:mm').format(tripDate)),
-                  const Divider(),
-                  _buildDetailRow('Origen:', trip['origen'] ?? 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow(
-                      'Destino:', trip['destino'] ?? 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow(
-                      'Pasajero:', trip['pasajero'] ?? 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow('Tarifa:',
-                      'L. ${(trip['tarifa'] ?? 0.0).toStringAsFixed(2)}'),
-                ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Detalles principales
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildDetailRow('Fecha:',
+                                DateFormat('dd/MM/yyyy').format(fecha)),
+                            const Divider(),
+                            _buildDetailRow('Hora inicio:', horaInicio),
+                            const Divider(),
+                            _buildDetailRow('Hora fin:', horaFin),
+                            const Divider(),
+                            _buildDetailRow('Origen:', origen),
+                            const Divider(),
+                            _buildDetailRow('Destino:', destino),
+                            const Divider(),
+                            _buildDetailRow('Costo:',
+                                'L. ${costoNumerico.toStringAsFixed(2)}'),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Información del pasajero
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Pasajero',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildDetailRow('Nombre:', pasajeroNombre),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Spacer(),
-            if (trip['estado'] == 4) // Solo para viajes completados
-              CustomButton(
-                text: 'Ver Factura',
-                onPressed: () {
-                  // Implementar visualización de factura
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Función de factura en desarrollo')),
-                  );
-                },
-              ),
-            const SizedBox(height: 12),
-            OutlinedButton(
+
+            // Button at the bottom
+            ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text('Cerrar'),
@@ -642,6 +653,25 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
     );
   }
 
+// Método para determinar el color del estado
+  Color _getStatusColor(int status) {
+    switch (status) {
+      case 1:
+        return Colors.orange; // PENDIENTE
+      case 2:
+        return Colors.blue; // ACEPTADO
+      case 3:
+        return Colors.amber; // EN CURSO
+      case 4:
+        return Colors.green; // COMPLETADO
+      case 5:
+        return Colors.red; // CANCELADO
+      default:
+        return Colors.grey; // Desconocido
+    }
+  }
+
+// Método auxiliar para construir filas de detalles
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -652,9 +682,9 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black54,
+                color: Colors.grey[700],
               ),
             ),
           ),
@@ -662,7 +692,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             child: Text(
               value,
               style: const TextStyle(
-                color: Colors.black87,
+                fontSize: 16,
               ),
             ),
           ),

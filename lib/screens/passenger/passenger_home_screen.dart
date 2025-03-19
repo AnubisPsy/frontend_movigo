@@ -8,6 +8,9 @@ import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
+import 'package:movigo_frontend/screens/passenger/trip_price_screen.dart';
+import 'package:movigo_frontend/screens/passenger/trip_confirmation_screen.dart';
+import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 
 class PassengerHomeScreen extends StatefulWidget {
   const PassengerHomeScreen({super.key});
@@ -90,8 +93,16 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         _refreshTimer?.cancel(); // Detener el timer de actualización
       });
 
-      // Mostrar diálogo de viaje completado
-      _showCompletedDialog();
+      // Navegar a la pantalla de viaje completado
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TripCompletedScreen(
+            tripData: data,
+            isConductor: false,
+          ),
+        ),
+      );
     }
   }
 
@@ -221,7 +232,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MoviGO'),
+        title: const Text('MoviGOOO'),
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
@@ -345,48 +356,34 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
             },
           ),
           const SizedBox(height: 16),
+          // En PassengerHomeScreen
           CustomButton(
             text: 'Solicitar Viaje',
-            onPressed: () async {
-              try {
-                final origin = _originController.text;
-                final destination = _destinationController.text;
+            onPressed: () {
+              final origin = _originController.text;
+              final destination = _destinationController.text;
 
-                if (origin.isEmpty || destination.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Por favor ingresa origen y destino')),
-                  );
-                  return;
-                }
-
-                // Mostrar indicador de carga
-                setState(() => _isLoading = true);
-
-                final trip =
-                    await _passengerService.requestTrip(origin, destination);
-
-                if (!mounted) return;
-
-                setState(() {
-                  _isLoading = false;
-                  _activeTrip = trip;
-                });
-
+              if (origin.isEmpty || destination.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('¡Viaje solicitado con éxito!'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
-                  ),
+                      content: Text('Por favor ingresa origen y destino')),
                 );
-              } catch (e) {
-                if (!mounted) return;
-                setState(() => _isLoading = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: ${e.toString()}')),
-                );
+                return;
               }
+
+              print(
+                  "Navegando a pantalla de confirmación: origin=$origin, destination=$destination");
+
+              // Solo navegamos a la pantalla de confirmación
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TripConfirmationScreen(
+                    origin: origin,
+                    destination: destination,
+                  ),
+                ),
+              );
             },
           ),
         ],

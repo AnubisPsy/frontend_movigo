@@ -288,4 +288,110 @@ class PassengerService {
       return null;
     }
   }
+
+  // Añadir estos métodos a la clase PassengerService
+
+  Future<Map<String, dynamic>> proponerPrecio(
+      String tripId, double precio) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        throw Exception('No hay token de autenticación');
+      }
+
+      String url = '${ApiConstants.baseUrl}/viajes/$tripId/proponer-precio';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'precio_propuesto': precio,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success']) {
+          return jsonResponse['data'];
+        } else {
+          throw Exception(jsonResponse['message']);
+        }
+      } else {
+        throw Exception('Error al proponer precio: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en proponerPrecio: $e');
+      throw Exception('Error al proponer precio');
+    }
+  }
+
+  Future<Map<String, dynamic>> aceptarContrapropuesta(String tripId) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        throw Exception('No hay token de autenticación');
+      }
+
+      String url = '${ApiConstants.baseUrl}/viajes/$tripId/aceptar-propuesta';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success']) {
+          return jsonResponse['data'];
+        } else {
+          throw Exception(jsonResponse['message']);
+        }
+      } else {
+        throw Exception(
+            'Error al aceptar contraoferta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en aceptarContrapropuesta: $e');
+      throw Exception('Error al aceptar contraoferta');
+    }
+  }
+
+  Future<Map<String, dynamic>> rechazarPropuesta(String tripId) async {
+    try {
+      final token = await StorageService.getToken();
+      if (token == null) {
+        throw Exception('No hay token de autenticación');
+      }
+
+      String url = '${ApiConstants.baseUrl}/viajes/$tripId/rechazar-propuesta';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success']) {
+          return jsonResponse['data'];
+        } else {
+          throw Exception(jsonResponse['message']);
+        }
+      } else {
+        throw Exception('Error al rechazar propuesta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en rechazarPropuesta: $e');
+      throw Exception('Error al rechazar propuesta');
+    }
+  }
 }

@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
+import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 
 class DriverActiveTripScreen extends StatefulWidget {
   const DriverActiveTripScreen({super.key});
@@ -37,16 +38,6 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       _initialized = true;
       _initializeTrip();
     }
-  }
-
-  void _goToHome() {
-    // Navegar al home indicando que venimos de la pantalla de viaje activo
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/driver/home',
-      (route) => false,
-      arguments: {'fromActiveTripScreen': true},
-    );
   }
 
   void _initializeTrip() {
@@ -200,12 +191,6 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-
-            // Navegar de vuelta al home solo si el viaje fue completado
-            await Future.delayed(const Duration(seconds: 2));
-            if (mounted) {
-              RouteHelper.goToDriverHome(context);
-            }
           }
         }
       }
@@ -256,7 +241,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       final tripId = _activeTrip!['id'];
       print("Completando viaje ID: $tripId");
 
-      await _driverService.completeTrip(tripId);
+      final completedTrip = await _driverService.completeTrip(tripId);
 
       if (!mounted) return;
 
@@ -271,11 +256,16 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
         ),
       );
 
-      // Navegar de regreso a la pantalla principal
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
-        RouteHelper.goToDriverHome(context);
-      }
+      // Navegar a la pantalla de finalización de viaje
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TripCompletedScreen(
+            tripData: completedTrip,
+            isConductor: true,
+          ),
+        ),
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -306,12 +296,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                     title: const Text('Volver al inicio'),
                     content: const Text(
                         '¿Seguro que deseas regresar al inicio? Se mantendrá el viaje activo.'),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.home),
-                        onPressed: _goToHome,
-                      ),
-                    ],
+                    actions: [],
                   ),
                 );
               },
