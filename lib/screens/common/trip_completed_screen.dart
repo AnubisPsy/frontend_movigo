@@ -17,23 +17,56 @@ class MovigoTripCompletedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Extraer datos del viaje
+    // En trip_completed_screen.dart
+
+// Extraer datos del viaje
     final origen = tripData['origen'] ?? 'No disponible';
     final destino = tripData['destino'] ?? 'No disponible';
+
+// Procesar fechas correctamente
     final fechaInicio = tripData['fecha_inicio'] != null
         ? DateTime.parse(tripData['fecha_inicio'])
-        : DateTime.now();
+            .toLocal() // Convertir a hora local
+        : DateTime.now().toLocal();
     final fechaFin = tripData['fecha_fin'] != null
         ? DateTime.parse(tripData['fecha_fin'])
-        : DateTime.now();
+            .toLocal() // Convertir a hora local
+        : DateTime.now().toLocal();
 
+// Las horas se deben mostrar en formato local
+    _buildDetailRow('Hora inicio:', DateFormat('HH:mm').format(fechaInicio));
+    _buildDetailRow('Hora fin:', DateFormat('HH:mm').format(fechaFin));
+
+// Calcular duración del viaje
     // Calcular duración del viaje
     String duracionTexto = 'No disponible';
-    if (tripData['fecha_inicio'] != null && tripData['fecha_fin'] != null) {
-      final duracion = fechaFin.difference(fechaInicio);
-      final horas = duracion.inHours;
-      final minutos = duracion.inMinutes.remainder(60);
+
+// IMPORTANTE: Priorizar el uso del campo duracion_minutos
+    if (tripData['duracion_minutos'] != null) {
+      // Convertir a entero explícitamente para evitar problemas de tipo
+      final duracionMinutos =
+          int.tryParse(tripData['duracion_minutos'].toString()) ?? 0;
+      final horas = duracionMinutos ~/ 60;
+      final minutos = duracionMinutos % 60;
       duracionTexto = horas > 0 ? '$horas h $minutos min' : '$minutos min';
+
+      // Log para depuración
+      print('Usando duracion_minutos del backend: $duracionMinutos minutos');
+    } else {
+      // Solo como fallback, aunque no debería llegar aquí si el backend envía duracion_minutos
+      print(
+          'ADVERTENCIA: duracion_minutos no disponible, calculando manualmente');
+      final duracion = fechaFin.difference(fechaInicio);
+      final minutos = duracion.inMinutes;
+      final horas = minutos ~/ 60;
+      final minutosRestantes = minutos % 60;
+      duracionTexto =
+          horas > 0 ? '$horas h $minutosRestantes min' : '$minutos min';
+
+      // Log para depuración de la diferencia manual
+      print('Fecha inicio: $fechaInicio');
+      print('Fecha fin: $fechaFin');
+      print('Duración calculada (minutos): $minutos');
     }
 
     // Datos del conductor o pasajero (según corresponda)
@@ -134,10 +167,10 @@ class MovigoTripCompletedScreen extends StatelessWidget {
                         'Fecha:', DateFormat('dd/MM/yyyy').format(fechaInicio)),
                     const Divider(),
                     _buildDetailRow('Hora inicio:',
-                        DateFormat('HH:mm').format(fechaInicio)),
+                        DateFormat('HH:mm').format(fechaInicio.toLocal())),
                     const Divider(),
-                    _buildDetailRow(
-                        'Hora fin:', DateFormat('HH:mm').format(fechaFin)),
+                    _buildDetailRow('Hora fin:',
+                        DateFormat('HH:mm').format(fechaFin.toLocal())),
                     const Divider(),
                     _buildDetailRow('Duración:', duracionTexto),
                   ],

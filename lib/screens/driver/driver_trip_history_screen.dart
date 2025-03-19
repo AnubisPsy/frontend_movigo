@@ -760,11 +760,25 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
   }
 
   void _showTripDetails(Map<String, dynamic> trip) {
+    print("Datos completos del viaje: $trip");
+    print("Formato de la fecha recibida: ${trip['fecha']}");
     // Extraer datos importantes
     final origen = trip['origen'] ?? 'No disponible';
     final destino = trip['destino'] ?? 'No disponible';
-    final fecha =
-        trip['fecha'] != null ? DateTime.parse(trip['fecha']) : DateTime.now();
+
+    DateTime fecha = DateTime.now(); // Quitar 'final' para poder modificarla
+
+    try {
+      if (trip['fecha'] != null) {
+        if (trip['fecha'] is String) {
+          fecha = DateTime.parse(trip['fecha']);
+        } else if (trip['fecha'] is DateTime) {
+          fecha = trip['fecha'];
+        }
+      }
+    } catch (e) {
+      print('Error al analizar fecha: $e');
+    }
 
     // Extraer hora_inicio y hora_fin si existen
     final horaInicio = trip['hora_inicio'] ?? 'No disponible';
