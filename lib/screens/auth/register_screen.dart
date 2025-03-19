@@ -1,162 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
+import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
-import 'package:movigo_frontend/widgets/common/custom_text_field.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class MovigoRegisterScreen extends StatefulWidget {
+  const MovigoRegisterScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<MovigoRegisterScreen> createState() => _MovigoRegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
   String _selectedRole = '1'; // 1: Pasajero por defecto
   bool _isLoading = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registro'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CustomTextField(
-                label: 'Nombre',
-                controller: _nombreController,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor ingrese su nombre';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Apellido',
-                controller: _apellidoController,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor ingrese su apellido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Correo electrónico',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor ingrese su correo';
-                  }
-                  // Validación básica de email
-                  if (!value!.contains('@')) {
-                    return 'Ingrese un correo válido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              CustomTextField(
-                label: 'Contraseña',
-                controller: _passwordController,
-                isPassword: true,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor ingrese su contraseña';
-                  }
-                  if ((value?.length ?? 0) < 6) {
-                    return 'La contraseña debe tener al menos 6 caracteres';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Campo de confirmación de contraseña
-              CustomTextField(
-                label: 'Confirmar Contraseña',
-                controller: _confirmPasswordController,
-                isPassword: true,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor confirme su contraseña';
-                  }
-                  if (value != _passwordController.text) {
-                    return 'Las contraseñas no coinciden';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // Selector de rol
-              Row(
-                children: [
-                  Expanded(
-                    child: RadioListTile<String>(
-                      title: const Text('Pasajero'),
-                      value: '1',
-                      groupValue: _selectedRole,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRole = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: RadioListTile<String>(
-                      title: const Text('Conductor'),
-                      value: '2',
-                      groupValue: _selectedRole,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedRole = value!;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              CustomButton(
-                text: 'Registrarse',
-                isLoading: _isLoading,
-                onPressed: _register,
-              ),
-
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-                child: const Text('¿Ya tienes cuenta? Inicia sesión'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void dispose() {
+    _nombreController.dispose();
+    _apellidoController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 
   void _register() async {
@@ -184,20 +60,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             // Navegamos según el rol
             if (_selectedRole == '1') {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/passenger/home',
-                (route) => false,
-              );
+              RouteHelper.goToPassengerHome(context);
             } else {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/driver/info', // Los conductores primero deben configurar su información
-                (route) => false,
-              );
+              // Los conductores primero deben configurar su información
+              RouteHelper.goToDriverInfo(context);
             }
           } else {
             // Si no recibimos token, vamos a login
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Registro exitoso. Por favor inicia sesión.'),
+                backgroundColor: Colors.green,
+              ),
+            );
             Navigator.pushReplacementNamed(context, '/login');
           }
         }
@@ -215,14 +90,260 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Añade este método para validar el formulario
+  void _validateForm() {
+    if (_nombreController.text.isEmpty) {
+      _showError('Por favor ingresa tu nombre');
+      return;
+    }
+
+    if (_apellidoController.text.isEmpty) {
+      _showError('Por favor ingresa tu apellido');
+      return;
+    }
+
+    if (_emailController.text.isEmpty) {
+      _showError('Por favor ingresa tu correo electrónico');
+      return;
+    }
+
+    // Validación de formato de correo
+    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegExp.hasMatch(_emailController.text)) {
+      _showError('Por favor ingresa un correo electrónico válido');
+      return;
+    }
+
+    if (_passwordController.text.isEmpty) {
+      _showError('Por favor ingresa una contraseña');
+      return;
+    }
+
+    if (_passwordController.text.length < 6) {
+      _showError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (_confirmPasswordController.text != _passwordController.text) {
+      _showError('Las contraseñas no coinciden');
+      return;
+    }
+
+    // Si todo está bien, proceder con el registro
+    _register();
+  }
+
+// Método auxiliar para mostrar errores
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   @override
-  void dispose() {
-    _nombreController.dispose();
-    _apellidoController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController
-        .dispose(); // No olvides dispose del nuevo controller
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: movigoDarkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Registro',
+          style: TextStyle(
+            color: movigoDarkColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            child: Text(
+              'Iniciar Sesión',
+              style: TextStyle(
+                color: movigoPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Crear Cuenta',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: movigoDarkColor,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Completa tus datos para crear una cuenta',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: movigoGreyColor,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Nombre
+                MovigoTextField(
+                  hintText: 'Nombre',
+                  controller: _nombreController,
+                  prefixIcon: Icons.person,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Apellido
+                MovigoTextField(
+                  hintText: 'Apellido',
+                  controller: _apellidoController,
+                  prefixIcon: Icons.person_outline,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Email
+                MovigoTextField(
+                  hintText: 'Correo electrónico',
+                  controller: _emailController,
+                  prefixIcon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Contraseña
+                MovigoTextField(
+                  hintText: 'Contraseña',
+                  controller: _passwordController,
+                  isPassword: true,
+                  prefixIcon: Icons.lock,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Confirmar contraseña
+                MovigoTextField(
+                  hintText: 'Confirmar contraseña',
+                  controller: _confirmPasswordController,
+                  isPassword: true,
+                  prefixIcon: Icons.lock_outline,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Selector de rol
+                Text(
+                  'Tipo de cuenta',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: movigoDarkColor,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: movigoBorderColor),
+                    borderRadius: BorderRadius.circular(movigoButtonRadius),
+                  ),
+                  child: Column(
+                    children: [
+                      RadioListTile<String>(
+                        title: const Text('Pasajero'),
+                        value: '1',
+                        groupValue: _selectedRole,
+                        activeColor: movigoPrimaryColor,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRole = value!;
+                          });
+                        },
+                      ),
+                      Divider(height: 1, color: movigoBorderColor),
+                      RadioListTile<String>(
+                        title: const Text('Conductor'),
+                        value: '2',
+                        groupValue: _selectedRole,
+                        activeColor: movigoPrimaryColor,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedRole = value!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Términos y condiciones
+                RichText(
+                  text: TextSpan(
+                    text: 'Al hacer clic en "Registrarse" aceptas nuestros ',
+                    style: TextStyle(color: movigoGreyColor),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'términos y condiciones',
+                        style: TextStyle(
+                          color: movigoPrimaryColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' y la ',
+                        style: TextStyle(color: movigoGreyColor),
+                      ),
+                      TextSpan(
+                        text: 'política de privacidad',
+                        style: TextStyle(
+                          color: movigoPrimaryColor,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Botón de registro
+                MovigoButton(
+                  text: 'Registrarse',
+                  onPressed: _validateForm,
+                  isLoading: _isLoading,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

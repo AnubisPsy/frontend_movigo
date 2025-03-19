@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:intl/intl.dart';
 
-class TripCompletedScreen extends StatelessWidget {
+class MovigoTripCompletedScreen extends StatelessWidget {
   final Map<String, dynamic> tripData;
   final bool isConductor;
 
-  const TripCompletedScreen({
+  const MovigoTripCompletedScreen({
     Key? key,
     required this.tripData,
     this.isConductor = false,
@@ -20,14 +22,14 @@ class TripCompletedScreen extends StatelessWidget {
     final destino = tripData['destino'] ?? 'No disponible';
     final fechaInicio = tripData['fecha_inicio'] != null
         ? DateTime.parse(tripData['fecha_inicio'])
-        : null;
+        : DateTime.now();
     final fechaFin = tripData['fecha_fin'] != null
         ? DateTime.parse(tripData['fecha_fin'])
-        : null;
+        : DateTime.now();
 
     // Calcular duración del viaje
     String duracionTexto = 'No disponible';
-    if (fechaInicio != null && fechaFin != null) {
+    if (tripData['fecha_inicio'] != null && tripData['fecha_fin'] != null) {
       final duracion = fechaFin.difference(fechaInicio);
       final horas = duracion.inHours;
       final minutos = duracion.inMinutes.remainder(60);
@@ -49,8 +51,16 @@ class TripCompletedScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Viaje Completado'),
-        automaticallyImplyLeading: false, // Eliminar botón de retroceso
+        backgroundColor: movigoPrimaryColor,
+        elevation: 0,
+        title: const Text(
+          'Viaje Completado',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        automaticallyImplyLeading: false, // Quitar botón de retroceso
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -67,10 +77,18 @@ class TripCompletedScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                      size: 60,
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 60,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -83,10 +101,10 @@ class TripCompletedScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Costo Total: L. $costo',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: movigoPrimaryColor,
                       ),
                     ),
                   ],
@@ -99,6 +117,10 @@ class TripCompletedScreen extends StatelessWidget {
             // Detalles del viaje
             _buildSectionTitle('Detalles del Viaje'),
             Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -109,22 +131,13 @@ class TripCompletedScreen extends StatelessWidget {
                     _buildDetailRow('Destino:', destino),
                     const Divider(),
                     _buildDetailRow(
-                        'Fecha:',
-                        fechaInicio != null
-                            ? DateFormat('dd/MM/yyyy').format(fechaInicio)
-                            : 'No disponible'),
+                        'Fecha:', DateFormat('dd/MM/yyyy').format(fechaInicio)),
+                    const Divider(),
+                    _buildDetailRow('Hora inicio:',
+                        DateFormat('HH:mm').format(fechaInicio)),
                     const Divider(),
                     _buildDetailRow(
-                        'Hora inicio:',
-                        fechaInicio != null
-                            ? DateFormat('HH:mm').format(fechaInicio)
-                            : 'No disponible'),
-                    const Divider(),
-                    _buildDetailRow(
-                        'Hora fin:',
-                        fechaFin != null
-                            ? DateFormat('HH:mm').format(fechaFin)
-                            : 'No disponible'),
+                        'Hora fin:', DateFormat('HH:mm').format(fechaFin)),
                     const Divider(),
                     _buildDetailRow('Duración:', duracionTexto),
                   ],
@@ -134,9 +147,13 @@ class TripCompletedScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Información personal
+            // Información personal (conductor o pasajero)
             _buildSectionTitle(isConductor ? 'Pasajero' : 'Conductor'),
             Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -159,6 +176,10 @@ class TripCompletedScreen extends StatelessWidget {
             // Sección de calificación (opcional)
             _buildSectionTitle('¿Cómo fue tu experiencia?'),
             Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -174,7 +195,7 @@ class TripCompletedScreen extends StatelessWidget {
                         return IconButton(
                           icon: const Icon(Icons.star_border),
                           onPressed: () {
-                            // Implementar calificación en el futuro
+                            // En una implementación completa, aquí guardarías la calificación
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content:
@@ -184,7 +205,7 @@ class TripCompletedScreen extends StatelessWidget {
                             );
                           },
                           iconSize: 36,
-                          color: Colors.amber,
+                          color: movigoSecondaryColor,
                         );
                       }),
                     ),
@@ -193,10 +214,10 @@ class TripCompletedScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
 
             // Botón para volver al inicio
-            CustomButton(
+            MovigoButton(
               text: 'Volver al Inicio',
               onPressed: () {
                 if (isConductor) {
@@ -217,10 +238,10 @@ class TripCompletedScreen extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: movigoDarkColor,
         ),
       ),
     );
@@ -236,9 +257,9 @@ class TripCompletedScreen extends StatelessWidget {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black54,
+                color: Colors.grey[600],
               ),
             ),
           ),

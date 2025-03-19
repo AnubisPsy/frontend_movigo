@@ -46,11 +46,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         // Rutas de autenticación
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/forgot-password': (context) => const ForgotPasswordScreen(),
-        '/verify-code': (context) => const VerifyCodeScreen(),
-        '/reset-password': (context) => const ResetPasswordScreen(),
+        '/login': (context) => const MovigoLoginScreen(),
+        '/register': (context) => const MovigoRegisterScreen(),
+        '/forgot-password': (context) => const MovigoForgotPasswordScreen(),
+        '/verify-code': (context) => const MovigoVerifyCodeScreen(),
+        '/reset-password': (context) => const MovigoResetPasswordScreen(),
 
         //Rutas del perfil
         '/profile': (context) => const ProfileScreen(),
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
         '/profile/change-password': (context) => const ChangePasswordScreen(),
 
         //Rutas en común
-        '/trip-completed': (context) => const TripCompletedScreen(
+        '/trip-completed': (context) => const MovigoTripCompletedScreen(
               tripData: {}, // Esto se pasa como argumento al navegar
               isConductor: false, // Esto también
             ),
@@ -72,7 +72,8 @@ class MyApp extends StatelessWidget {
         '/driver/vehicle-info': (context) => const VehicleInfoScreen(),
         '/driver/home': (context) => const DriverHomeScreen(),
         '/driver/history': (context) => const DriverTripHistoryScreen(),
-        '/driver/active-trip': (context) => const DriverActiveTripScreen(),
+        '/driver/active-trip': (context) =>
+            const MovigoDriverActiveTripScreen(),
         '/driver/negotiation': (context) => const DriverNegotiationScreen(),
       },
       // Manejo de rutas no definidas

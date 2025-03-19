@@ -97,7 +97,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TripCompletedScreen(
+          builder: (context) => MovigoTripCompletedScreen(
             tripData: data,
             isConductor: false,
           ),

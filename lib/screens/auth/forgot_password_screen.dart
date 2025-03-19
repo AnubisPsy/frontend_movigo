@@ -1,98 +1,194 @@
 import 'package:flutter/material.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
+import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
-import 'package:movigo_frontend/widgets/common/custom_text_field.dart';
+import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class MovigoForgotPasswordScreen extends StatefulWidget {
+  const MovigoForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<MovigoForgotPasswordScreen> createState() =>
+      _MovigoForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _MovigoForgotPasswordScreenState
+    extends State<MovigoForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recuperar Contraseña'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Ingresa tu correo electrónico para recibir el código de recuperación',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              CustomTextField(
-                label: 'Correo electrónico',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Por favor ingrese su correo';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              CustomButton(
-                text: 'Enviar Código',
-                isLoading: _isLoading,
-                onPressed: _sendCode,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 
   void _sendCode() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor ingresa tu correo electrónico')),
+      );
+      return;
+    }
 
-      try {
-        await AuthService.forgotPassword(_emailController.text);
+    // Validación básica de formato de correo
+    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegExp.hasMatch(_emailController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor ingresa un correo electrónico válido')),
+      );
+      return;
+    }
 
-        if (mounted) {
-          setState(() => _isLoading = false);
+    setState(() => _isLoading = true);
 
-          // Navegamos a la pantalla de verificación
-          Navigator.pushNamed(
-            context,
-            '/verify-code',
-            arguments: {'email': _emailController.text},
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+    try {
+      await AuthService.forgotPassword(_emailController.text);
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+
+        // Mostrar mensaje de éxito
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Se ha enviado un código a tu correo electrónico'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navegar a la pantalla de verificación de código
+        RouteHelper.goToVerifyCode(
+          context,
+          {'email': _emailController.text},
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: movigoDarkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Recuperar Contraseña',
+          style: TextStyle(
+            color: movigoDarkColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+
+                // Icono de recuperación
+                Center(
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: movigoPrimaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Icon(
+                      Icons.lock_reset,
+                      size: 50,
+                      color: movigoPrimaryColor,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Título y descripción
+                Text(
+                  '¿Olvidaste tu contraseña?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: movigoDarkColor,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  'Ingresa tu correo electrónico para recibir un código de verificación y poder restablecer tu contraseña.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: movigoGreyColor,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Campo de correo electrónico
+                MovigoTextField(
+                  hintText: 'Correo electrónico',
+                  controller: _emailController,
+                  prefixIcon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+
+                const SizedBox(height: 30),
+
+                // Botón para enviar código
+                MovigoButton(
+                  text: 'Enviar Código',
+                  onPressed: _sendCode,
+                  isLoading: _isLoading,
+                ),
+
+                const SizedBox(height: 20),
+
+                // Volver a inicio de sesión
+                Center(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Volver a Iniciar Sesión',
+                      style: TextStyle(
+                        color: movigoPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

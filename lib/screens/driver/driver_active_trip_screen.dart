@@ -1,22 +1,25 @@
-// lib/screens/driver/driver_active_trip_screen.dart
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/driver_service.dart';
+import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
+import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
-import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 
-class DriverActiveTripScreen extends StatefulWidget {
-  const DriverActiveTripScreen({super.key});
+class MovigoDriverActiveTripScreen extends StatefulWidget {
+  const MovigoDriverActiveTripScreen({Key? key}) : super(key: key);
 
   @override
-  State<DriverActiveTripScreen> createState() => _DriverActiveTripScreenState();
+  State<MovigoDriverActiveTripScreen> createState() =>
+      _MovigoDriverActiveTripScreenState();
 }
 
-class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
+class _MovigoDriverActiveTripScreenState
+    extends State<MovigoDriverActiveTripScreen> {
   final DriverService _driverService = DriverService();
   bool _isLoading = false;
   Map<String, dynamic>? _activeTrip;
@@ -117,9 +120,6 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
     try {
       final activeTrip = await _driverService.getActiveTrip();
 
-      print(
-          "Resultado de getActiveTrip: ${activeTrip != null ? 'Viaje encontrado' : 'No hay viaje activo'}");
-
       if (!mounted) return;
 
       setState(() {
@@ -167,7 +167,6 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       print("Refrescando estado del viaje ID: $tripId");
 
       // Obtener el estado actual del viaje mediante una llamada específica
-      // en lugar de usar getActiveTrip que podría dar falsos negativos
       final response = await _driverService.getTripById(tripId);
 
       if (!mounted) return;
@@ -260,7 +259,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TripCompletedScreen(
+          builder: (context) => MovigoTripCompletedScreen(
             tripData: completedTrip,
             isConductor: true,
           ),
@@ -284,11 +283,19 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Viaje Activo'),
+          backgroundColor: movigoPrimaryColor,
+          elevation: 0,
+          title: const Text(
+            'Viaje Activo',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           automaticallyImplyLeading: false, // Evitar botón de retroceso
           actions: [
             IconButton(
-              icon: const Icon(Icons.home),
+              icon: const Icon(Icons.home, color: Colors.white),
               onPressed: () {
                 showDialog(
                   context: context,
@@ -296,7 +303,22 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                     title: const Text('Volver al inicio'),
                     content: const Text(
                         '¿Seguro que deseas regresar al inicio? Se mantendrá el viaje activo.'),
-                    actions: [],
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancelar'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          RouteHelper.goToDriverHome(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: movigoPrimaryColor,
+                        ),
+                        child: const Text('Confirmar'),
+                      ),
+                    ],
                   ),
                 );
               },
@@ -317,30 +339,43 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.directions_car_outlined,
-            size: 64,
-            color: Colors.grey,
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.directions_car_outlined,
+              size: 50,
+              color: Colors.grey[400],
+            ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No hay viaje activo',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
+              color: movigoDarkColor,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'No se encontró ningún viaje en estado activo',
             style: TextStyle(
-              color: Colors.grey,
+              color: movigoGreyColor,
+              fontSize: 16,
             ),
           ),
-          const SizedBox(height: 24),
-          CustomButton(
-            text: 'Volver al inicio',
-            onPressed: () => RouteHelper.goToDriverHome(context),
+          const SizedBox(height: 30),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: MovigoButton(
+              text: 'Volver al inicio',
+              onPressed: () => RouteHelper.goToDriverHome(context),
+            ),
           ),
         ],
       ),
@@ -351,7 +386,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
     // Determinar el estado del viaje
     int estado = _activeTrip!['estado'] ?? 2;
     String statusText = '';
-    Color statusColor = Colors.blue;
+    Color statusColor = movigoPrimaryColor;
 
     switch (estado) {
       case 2:
@@ -360,7 +395,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
         break;
       case 3:
         statusText = 'EN CURSO';
-        statusColor = Colors.amber;
+        statusColor = movigoSecondaryColor;
         break;
       case 4:
         statusText = 'COMPLETADO';
@@ -392,7 +427,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(movigoBottomSheetRadius),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -406,19 +441,30 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      statusText,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Text(
+                        statusText,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: statusColor,
+                        ),
                       ),
                     ),
                     Text(
                       'L. ${(_activeTrip!['tarifa'] ?? 0.0).toStringAsFixed(2)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: movigoDarkColor,
                       ),
                     ),
                   ],
@@ -428,7 +474,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                 // Información de origen y destino
                 Row(
                   children: [
-                    const Icon(Icons.location_on, color: Colors.green),
+                    Icon(Icons.location_on, color: Colors.green),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -441,7 +487,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_searching, color: Colors.red),
+                    Icon(Icons.location_searching, color: Colors.red),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -467,14 +513,15 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                         children: [
                           Text(
                             _activeTrip!['pasajero'] ?? 'Pasajero',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
+                              color: movigoDarkColor,
                             ),
                           ),
                           Text(
                             _activeTrip!['telefono_pasajero'] ?? 'Sin teléfono',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: movigoGreyColor,
                             ),
                           ),
                         ],
@@ -482,6 +529,7 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.phone),
+                      color: movigoPrimaryColor,
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -496,14 +544,17 @@ class _DriverActiveTripScreenState extends State<DriverActiveTripScreen> {
 
                 // Botones de acción según el estado
                 if (estado == 2) // ACEPTADO - puede iniciar viaje
-                  CustomButton(
+                  MovigoButton(
                     text: 'Iniciar Viaje',
                     onPressed: _startTrip,
+                    isLoading: _isLoading,
                   )
                 else if (estado == 3) // EN CURSO - puede completar viaje
-                  CustomButton(
+                  MovigoButton(
                     text: 'Completar Viaje',
                     onPressed: _completeTrip,
+                    isLoading: _isLoading,
+                    color: Colors.green,
                   ),
               ],
             ),
