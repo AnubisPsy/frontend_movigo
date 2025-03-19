@@ -110,7 +110,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'MoviGO',
+                      'MoviGO!',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
+import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/driver_service.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/socket_service.dart';
@@ -148,7 +151,6 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
     }
   }
 
-// Reemplazar el método _rechazarPropuesta por este:
   void _salirSinRechazar() {
     // Mostrar un mensaje informativo
     ScaffoldMessenger.of(context).showSnackBar(
@@ -214,267 +216,471 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
     super.dispose();
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Negociar Precio'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: movigoDarkColor,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Negociar Precio',
+          style: TextStyle(
+            color: movigoDarkColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Información del viaje
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Detalles del Viaje',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildInfoRow(
-                            'Origen:',
-                            _tripData?['origen'] ?? 'No disponible',
-                          ),
-                          _buildInfoRow(
-                            'Destino:',
-                            _tripData?['destino'] ?? 'No disponible',
-                          ),
-                          if (_tripData?['Usuario'] != null)
-                            _buildInfoRow(
-                              'Pasajero:',
-                              '${_tripData!['Usuario']['nombre']} ${_tripData!['Usuario']['apellido']}',
-                            ),
-                        ],
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Icono de negociación
+                    Center(
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: movigoSecondaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Icon(
+                          Icons.handshake,
+                          size: 50,
+                          color: movigoSecondaryColor,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
 
-                  // Estado de la negociación
-                  if (_estadoNegociacion == 'propuesto') ...[
+                    const SizedBox(height: 30),
+
+                    // Título según el estado de negociación
+                    Text(
+                      _getTitleForState(),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: movigoDarkColor,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Descripción
+                    Text(
+                      _getDescriptionForState(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: movigoGreyColor,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Información del viaje
                     Card(
-                      color: Colors.blue.shade50,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(movigoButtonRadius),
+                        side: BorderSide(color: movigoBorderColor, width: 1),
+                      ),
+                      elevation: 0,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Precio Propuesto por el Pasajero',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
                             Text(
-                              'L. ${_precioPropuesto?.toStringAsFixed(2) ?? "0.00"}',
-                              style: const TextStyle(
-                                fontSize: 24,
+                              'Detalles del Viaje',
+                              style: TextStyle(
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                                color: movigoDarkColor,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: _aceptarPrecioPropuesto,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 16),
-                              ),
-                              child: const Text('Aceptar este precio'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Propone tu precio:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _priceController,
-                      decoration: const InputDecoration(
-                        labelText: 'Tu precio (L.)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.attach_money),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _salirSinRechazar,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.blue,
-                            ),
-                            child: const Text('Salir'),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _contraproponerPrecio,
-                            child: const Text('Proponer'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ] else if (_estadoNegociacion == 'contrapropuesto') ...[
-                    Card(
-                      color: Colors.amber.shade50,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Tu Contraoferta',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'L. ${_tripData?['precio_final']?.toString() ?? "0.00"}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.amber,
-                              ),
+                            _buildInfoRow(
+                              'Origen:',
+                              _tripData?['origen'] ?? 'No disponible',
+                              Icons.location_on,
                             ),
                             const SizedBox(height: 12),
-                            const Text(
-                              'Esperando respuesta del pasajero...',
-                              style: TextStyle(fontStyle: FontStyle.italic),
+                            _buildInfoRow(
+                              'Destino:',
+                              _tripData?['destino'] ?? 'No disponible',
+                              Icons.location_searching,
                             ),
+                            const SizedBox(height: 12),
+                            if (_tripData?['Usuario'] != null)
+                              _buildInfoRow(
+                                'Pasajero:',
+                                '${_tripData!['Usuario']['nombre']} ${_tripData!['Usuario']['apellido']}',
+                                Icons.person,
+                              ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Volver'),
-                    ),
-                  ] else if (_estadoNegociacion == 'aceptado') ...[
-                    Card(
-                      color: Colors.green.shade50,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Precio Acordado',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+
+                    const SizedBox(height: 24),
+
+                    // Estado de la negociación
+                    if (_estadoNegociacion == 'propuesto') ...[
+                      // Precio propuesto por el pasajero
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(movigoButtonRadius),
+                        ),
+                        color: Colors.blue.shade50,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'Precio Propuesto por el Pasajero',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'L. ${_tripData?['precio_final']?.toString() ?? "0.00"}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(height: 12),
+                              Text(
+                                'L. ${_precioPropuesto?.toStringAsFixed(2) ?? "0.00"}',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: movigoPrimaryColor,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              MovigoButton(
+                                text: 'Aceptar este precio',
+                                onPressed: _aceptarPrecioPropuesto,
+                                isLoading: false,
                                 color: Colors.green,
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              '¡El pasajero ha aceptado tu contraoferta!',
-                              style: TextStyle(color: Colors.green),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    CustomButton(
-                      text: 'Continuar con el Viaje',
-                      onPressed: () => RouteHelper.goToDriverActiveTrip(context,
-                          arguments: _tripData),
-                    ),
-                  ] else if (_estadoNegociacion == 'rechazado') ...[
-                    Card(
-                      color: Colors.red.shade50,
-                      child: const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Negociación Cancelada',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
+
+                      const SizedBox(height: 24),
+
+                      // Proponer tu precio
+                      Text(
+                        'Propone tu precio:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: movigoDarkColor,
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      MovigoTextField(
+                        hintText: 'Tu precio (L.)',
+                        controller: _priceController,
+                        prefixIcon: Icons.attach_money,
+                        keyboardType: TextInputType.number,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _salirSinRechazar,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: movigoPrimaryColor,
+                                side: BorderSide(color: movigoPrimaryColor),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(movigoButtonRadius),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              child: Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 12),
-                            Text(
-                              'La propuesta de precio ha sido rechazada.',
-                              textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: MovigoButton(
+                              text: 'Proponer',
+                              onPressed: _contraproponerPrecio,
+                              isLoading: _isLoading,
+                              color: movigoSecondaryColor,
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ] else if (_estadoNegociacion == 'contrapropuesto') ...[
+                      // Tu contraoferta
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(movigoButtonRadius),
+                        ),
+                        color: Colors.amber.shade50,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'Tu Contraoferta',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'L. ${_tripData?['precio_final']?.toString() ?? "0.00"}',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber.shade700,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              _buildStatusIndicator(
+                                  'Esperando respuesta del pasajero...'),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    CustomButton(
-                      text: 'Volver',
-                      onPressed: () => Navigator.pop(context),
-                    ),
+
+                      const SizedBox(height: 30),
+
+                      MovigoButton(
+                        text: 'Volver',
+                        onPressed: () => Navigator.pop(context),
+                        isLoading: false,
+                      ),
+                    ] else if (_estadoNegociacion == 'aceptado') ...[
+                      // Precio acordado
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(movigoButtonRadius),
+                        ),
+                        color: Colors.green.shade50,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'Precio Acordado',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'L. ${_tripData?['precio_final']?.toString() ?? "0.00"}',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.check_circle, color: Colors.green),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    '¡El pasajero ha aceptado tu contraoferta!',
+                                    style: TextStyle(color: Colors.green),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      MovigoButton(
+                        text: 'Continuar con el Viaje',
+                        onPressed: () => RouteHelper.goToDriverActiveTrip(
+                            context,
+                            arguments: _tripData),
+                        isLoading: false,
+                        color: Colors.green,
+                      ),
+                    ] else if (_estadoNegociacion == 'rechazado') ...[
+                      // Negociación cancelada
+                      Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(movigoButtonRadius),
+                        ),
+                        color: Colors.red.shade50,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Negociación Cancelada',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.cancel, color: Colors.red),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'La propuesta de precio ha sido rechazada',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      MovigoButton(
+                        text: 'Volver',
+                        onPressed: () => Navigator.pop(context),
+                        isLoading: false,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
     );
+  }
+
+  Widget _buildInfoRow(String label, String value, IconData icon) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: movigoPrimaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Icon(
+            icon,
+            color: movigoPrimaryColor,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: movigoGreyColor,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: movigoDarkColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusIndicator(String text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.amber.shade700),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            color: Colors.amber.shade700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getTitleForState() {
+    switch (_estadoNegociacion) {
+      case 'propuesto':
+        return 'Propuesta de Viaje';
+      case 'contrapropuesto':
+        return 'Esperando Respuesta';
+      case 'aceptado':
+        return '¡Propuesta Aceptada!';
+      case 'rechazado':
+        return 'Propuesta Rechazada';
+      default:
+        return 'Negociación de Precio';
+    }
+  }
+
+  String _getDescriptionForState() {
+    switch (_estadoNegociacion) {
+      case 'propuesto':
+        return 'El pasajero ha propuesto un precio para este viaje. Puedes aceptarlo o hacer una contraoferta.';
+      case 'contrapropuesto':
+        return 'Has enviado una contraoferta al pasajero. Espera mientras el pasajero decide si aceptarla.';
+      case 'aceptado':
+        return 'El pasajero ha aceptado tu precio. Puedes continuar con el viaje.';
+      case 'rechazado':
+        return 'El pasajero ha rechazado tu contraoferta.';
+      default:
+        return 'Acuerda un precio para este viaje con el pasajero.';
+    }
   }
 }

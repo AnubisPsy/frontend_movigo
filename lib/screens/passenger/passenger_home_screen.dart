@@ -1,7 +1,8 @@
-// Modificaciones a passenger_home_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
+import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/passenger_service.dart';
 import 'dart:async';
@@ -106,7 +107,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     }
   }
 
-// Método actualizado para manejar viaje cancelado
+  // Método actualizado para manejar viaje cancelado
   void _handleViajeCancelado(dynamic data) {
     print('📱 Viaje cancelado recibido: $data');
     if (data != null && mounted) {
@@ -232,16 +233,24 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MoviGOOO'),
+        backgroundColor: movigoPrimaryColor,
+        elevation: 0,
+        title: const Text(
+          'MoviGO',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () {
               RouteHelper.goToPassengerHistory(context);
             },
           ),
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () => RouteHelper.goToProfile(context),
           ),
         ],
@@ -253,7 +262,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
             // Mapa en tiempo real
             Expanded(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(movigoButtonRadius),
                 child: MapaEnTiempoReal(
                   esViajePendiente: _activeTrip != null,
                   tripData: _activeTrip,
@@ -264,7 +273,11 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
 
             // Panel inferior que cambia según estado
             if (_isLoading)
-              const Center(child: CircularProgressIndicator())
+              Center(
+                child: CircularProgressIndicator(
+                  color: movigoPrimaryColor,
+                ),
+              )
             else if (_activeTrip != null)
               _buildActiveTripPanel()
             else
@@ -288,9 +301,15 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               Navigator.pop(context); // Cerrar el diálogo
               RouteHelper.goToPassengerHome(context); // Redirigir al home
             },
-            child: const Text('Aceptar'),
+            child: Text(
+              'Aceptar',
+              style: TextStyle(color: movigoPrimaryColor),
+            ),
           ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(movigoButtonRadius),
+        ),
       ),
     );
   }
@@ -308,9 +327,15 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               Navigator.pop(context); // Cerrar el diálogo
               RouteHelper.goToPassengerHome(context); // Redirigir al home
             },
-            child: const Text('Aceptar'),
+            child: Text(
+              'Aceptar',
+              style: TextStyle(color: movigoPrimaryColor),
+            ),
           ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(movigoButtonRadius),
+        ),
       ),
     );
   }
@@ -320,7 +345,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(movigoButtonRadius),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -332,32 +357,19 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
+          MovigoTextField(
+            hintText: '¿Dónde estás?',
             controller: _originController,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.location_on),
-              hintText: '¿Dónde estás?',
-              border: OutlineInputBorder(),
-            ),
-            onTap: () {
-              // Mostrar búsqueda de origen
-            },
+            prefixIcon: Icons.location_on,
           ),
           const SizedBox(height: 12),
-          TextField(
+          MovigoTextField(
+            hintText: '¿A dónde vas?',
             controller: _destinationController,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.location_searching),
-              hintText: '¿A dónde vas?',
-              border: OutlineInputBorder(),
-            ),
-            onTap: () {
-              // Mostrar búsqueda de destino
-            },
+            prefixIcon: Icons.location_searching,
           ),
           const SizedBox(height: 16),
-          // En PassengerHomeScreen
-          CustomButton(
+          MovigoButton(
             text: 'Solicitar Viaje',
             onPressed: () {
               final origin = _originController.text;
@@ -366,7 +378,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               if (origin.isEmpty || destination.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Por favor ingresa origen y destino')),
+                    content: Text('Por favor ingresa origen y destino'),
+                    backgroundColor: Colors.red,
+                  ),
                 );
                 return;
               }
@@ -420,7 +434,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(movigoButtonRadius),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -434,39 +448,51 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         children: [
           Text(
             statusText,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: movigoDarkColor,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
 
           // Información de origen y destino
           Row(
             children: [
-              const Icon(Icons.location_on, color: Colors.green),
+              Icon(Icons.location_on, color: Colors.green),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(_activeTrip!['origen'] ?? 'Origen no disponible'),
+                child: Text(
+                  _activeTrip!['origen'] ?? 'Origen no disponible',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: movigoDarkColor,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.location_searching, color: Colors.red),
+              Icon(Icons.location_searching, color: Colors.red),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(_activeTrip!['destino'] ?? 'Destino no disponible'),
+                child: Text(
+                  _activeTrip!['destino'] ?? 'Destino no disponible',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: movigoDarkColor,
+                  ),
+                ),
               ),
             ],
           ),
 
           // Solo mostrar el botón de cancelar si está en estado pendiente (1)
           if (estado == 1) ...[
-            const SizedBox(height: 16),
-            // Modificación para el método de cancelar viaje en el pasajero
-            CustomButton(
+            const SizedBox(height: 20),
+            MovigoButton(
               text: 'Cancelar Viaje',
               onPressed: () async {
                 try {
@@ -494,7 +520,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     setState(() => _isLoading = false);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('No se pudo cancelar el viaje')),
+                        content: Text('No se pudo cancelar el viaje'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                   }
                 } catch (e) {
@@ -502,10 +530,14 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                   print("Error al cancelar viaje: $e");
                   setState(() => _isLoading = false);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: ${e.toString()}')),
+                    SnackBar(
+                      content: Text('Error: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                 }
               },
+              color: Colors.red,
             ),
           ],
 
@@ -513,32 +545,77 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           if (estado >= 2 &&
               estado <= 4 &&
               _activeTrip!['conductor_id'] != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             const Divider(),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.grey[300],
-                  child: const Icon(Icons.person),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(_activeTrip!['conductor'] ?? 'Conductor'),
-                      Text(_activeTrip!['vehiculo'] ?? 'Vehículo'),
-                    ],
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(movigoButtonRadius),
+                border: Border.all(color: movigoBorderColor),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: movigoPrimaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      color: movigoPrimaryColor,
+                      size: 30,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.phone),
-                  onPressed: () {
-                    // Implementar llamada
-                  },
-                ),
-              ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _activeTrip!['conductor'] ?? 'Conductor',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: movigoDarkColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _activeTrip!['vehiculo'] ?? 'Vehículo',
+                          style: TextStyle(
+                            color: movigoGreyColor,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: movigoPrimaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.phone,
+                          color: Colors.white, size: 20),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Llamando al conductor...'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],

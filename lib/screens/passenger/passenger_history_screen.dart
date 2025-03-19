@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/widgets/trip/trip_card.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/passenger_service.dart';
 import 'package:intl/intl.dart';
@@ -47,13 +49,18 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             _maxCost != null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al cargar el historial: ${e.toString()}'),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al cargar el historial: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -113,31 +120,48 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: movigoPrimaryColor,
+        elevation: 0,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => RouteHelper.goToPassengerHome(context)),
-        title: const Text('Historial de Viajes'),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => RouteHelper.goToPassengerHome(context),
+        ),
+        title: const Text(
+          'Historial de Viajes',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           if (_filtersApplied)
             IconButton(
-              icon: const Icon(Icons.filter_alt_off),
+              icon: const Icon(Icons.filter_alt_off, color: Colors.white),
               onPressed: () {
                 _resetFilters();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Filtros eliminados')),
+                  const SnackBar(
+                    content: Text('Filtros eliminados'),
+                    backgroundColor: Colors.green,
+                  ),
                 );
               },
             ),
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list, color: Colors.white),
             onPressed: _showFilters,
           ),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: movigoPrimaryColor,
+              ),
+            )
           : RefreshIndicator(
               onRefresh: _loadTrips,
+              color: movigoPrimaryColor,
               child: _trips.isEmpty ? _buildEmptyState() : _buildTripsList(),
             ),
     );
@@ -148,36 +172,47 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.history,
-            size: 64,
-            color: Colors.grey[400],
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              Icons.history,
+              size: 50,
+              color: movigoGreyColor,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             _filtersApplied
                 ? 'No hay viajes que coincidan con los filtros'
                 : 'No hay viajes en tu historial',
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: movigoDarkColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             _filtersApplied
                 ? 'Intenta con otros filtros'
-                : 'Tus viajes aparecerán aquí',
+                : 'Tus viajes completados aparecerán aquí',
             style: TextStyle(
-              color: Colors.grey[500],
+              fontSize: 16,
+              color: movigoGreyColor,
             ),
           ),
           if (_filtersApplied)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: ElevatedButton(
+              padding: const EdgeInsets.only(top: 24),
+              child: MovigoButton(
+                text: 'Quitar filtros',
                 onPressed: _resetFilters,
-                child: const Text('Quitar filtros'),
+                color: movigoSecondaryColor,
               ),
             ),
         ],
@@ -193,17 +228,113 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
         final trip = _trips[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: GestureDetector(
-            onTap: () => _showTripDetails(trip),
-            child: TripCard(
-              origin: trip['origin'],
-              destination: trip['destination'],
-              date: trip['date'],
-              driverName: trip['driverName'],
-              vehicleInfo: trip['vehicleInfo'],
-              cost: trip['cost'],
-              type: TripCardType.history,
-              passengerName: null,
+          child: Card(
+            margin: EdgeInsets.zero,
+            elevation: 3,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(movigoButtonRadius),
+            ),
+            child: InkWell(
+              onTap: () => _showTripDetails(trip),
+              borderRadius: BorderRadius.circular(movigoButtonRadius),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(trip['status']),
+                            borderRadius:
+                                BorderRadius.circular(movigoButtonRadius),
+                          ),
+                          child: Text(
+                            _getStatusText(trip['status']),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          DateFormat('dd/MM/yyyy').format(trip['date']),
+                          style: TextStyle(
+                            color: movigoGreyColor,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.green),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            trip['origin'] ?? 'Origen no disponible',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: movigoDarkColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.location_searching, color: Colors.red),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            trip['destination'] ?? 'Destino no disponible',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: movigoDarkColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.person_outline, color: movigoGreyColor),
+                            const SizedBox(width: 8),
+                            Text(
+                              trip['driverName'] ?? 'Conductor',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: movigoGreyColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Text(
+                          'L. ${trip['cost'].toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: movigoPrimaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );
@@ -211,199 +342,426 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     );
   }
 
+  String _getStatusText(int? status) {
+    switch (status) {
+      case 1:
+        return 'PENDIENTE';
+      case 2:
+        return 'ACEPTADO';
+      case 3:
+        return 'EN CURSO';
+      case 4:
+        return 'COMPLETADO';
+      case 5:
+        return 'CANCELADO';
+      default:
+        return 'DESCONOCIDO';
+    }
+  }
+
+  Color _getStatusColor(int? status) {
+    switch (status) {
+      case 1:
+        return Colors.orange; // PENDIENTE
+      case 2:
+        return Colors.blue; // ACEPTADO
+      case 3:
+        return movigoSecondaryColor; // EN CURSO
+      case 4:
+        return Colors.green; // COMPLETADO
+      case 5:
+        return Colors.red; // CANCELADO
+      default:
+        return movigoGreyColor; // Desconocido
+    }
+  }
+
   void _showFilters() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(movigoBottomSheetRadius),
+        ),
+      ),
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Filtrar por',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Text(
+                    'Filtrar viajes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: movigoDarkColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                // Filtro por fecha
-                ExpansionTile(
-                  leading: const Icon(Icons.date_range),
-                  title: const Text('Rango de fechas'),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () async {
-                                final selected = await showDatePicker(
-                                  context: context,
-                                  initialDate: _startDate ?? DateTime.now(),
-                                  firstDate: DateTime(2020),
-                                  lastDate: DateTime.now(),
-                                );
-                                if (selected != null) {
-                                  setModalState(() {
-                                    _startDate = selected;
-                                  });
-                                }
-                              },
-                              child: Text(_startDate == null
-                                  ? 'Fecha inicio'
-                                  : DateFormat('dd/MM/yyyy')
-                                      .format(_startDate!)),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () async {
-                                final selected = await showDatePicker(
-                                  context: context,
-                                  initialDate: _endDate ?? DateTime.now(),
-                                  firstDate: DateTime(2020),
-                                  lastDate: DateTime.now(),
-                                );
-                                if (selected != null) {
-                                  setModalState(() {
-                                    _endDate = selected;
-                                  });
-                                }
-                              },
-                              child: Text(_endDate == null
-                                  ? 'Fecha fin'
-                                  : DateFormat('dd/MM/yyyy').format(_endDate!)),
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Filtro por fecha
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(movigoButtonRadius),
+                      border: Border.all(color: movigoBorderColor),
                     ),
-                    if (_startDate != null || _endDate != null)
-                      TextButton(
-                        onPressed: () {
-                          setModalState(() {
-                            _startDate = null;
-                            _endDate = null;
-                          });
-                        },
-                        child: const Text('Limpiar fechas'),
-                      ),
-                  ],
-                ),
-
-                // Filtro por costo
-                ExpansionTile(
-                  leading: const Icon(Icons.attach_money),
-                  title: const Text('Rango de costo'),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'Costo mínimo',
-                                prefix: Text('\$'),
-                              ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (value) {
-                                if (value.isNotEmpty) {
-                                  setModalState(() {
-                                    _minCost = double.tryParse(value);
-                                  });
-                                } else {
-                                  setModalState(() {
-                                    _minCost = null;
-                                  });
-                                }
-                              },
-                              controller: TextEditingController(
-                                text: _minCost?.toString() ?? '',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.date_range, color: movigoPrimaryColor),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Rango de fechas',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: movigoDarkColor,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: TextField(
-                              decoration: const InputDecoration(
-                                labelText: 'Costo máximo',
-                                prefix: Text('\$'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final selected = await showDatePicker(
+                                    context: context,
+                                    initialDate: _startDate ?? DateTime.now(),
+                                    firstDate: DateTime(2020),
+                                    lastDate: DateTime.now(),
+                                    builder: (context, child) {
+                                      return Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: ColorScheme.light(
+                                            primary: movigoPrimaryColor,
+                                            onPrimary: Colors.white,
+                                          ),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
+                                  if (selected != null) {
+                                    setModalState(() {
+                                      _startDate = selected;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: movigoBorderColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _startDate == null
+                                            ? 'Fecha inicio'
+                                            : DateFormat('dd/MM/yyyy')
+                                                .format(_startDate!),
+                                        style: TextStyle(
+                                          color: _startDate == null
+                                              ? movigoGreyColor
+                                              : movigoDarkColor,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 18,
+                                        color: movigoGreyColor,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              keyboardType: TextInputType.number,
-                              onChanged: (value) {
-                                if (value.isNotEmpty) {
-                                  setModalState(() {
-                                    _maxCost = double.tryParse(value);
-                                  });
-                                } else {
-                                  setModalState(() {
-                                    _maxCost = null;
-                                  });
-                                }
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final selected = await showDatePicker(
+                                    context: context,
+                                    initialDate: _endDate ?? DateTime.now(),
+                                    firstDate: DateTime(2020),
+                                    lastDate: DateTime.now(),
+                                    builder: (context, child) {
+                                      return Theme(
+                                        data: Theme.of(context).copyWith(
+                                          colorScheme: ColorScheme.light(
+                                            primary: movigoPrimaryColor,
+                                            onPrimary: Colors.white,
+                                          ),
+                                        ),
+                                        child: child!,
+                                      );
+                                    },
+                                  );
+                                  if (selected != null) {
+                                    setModalState(() {
+                                      _endDate = selected;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: movigoBorderColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _endDate == null
+                                            ? 'Fecha fin'
+                                            : DateFormat('dd/MM/yyyy')
+                                                .format(_endDate!),
+                                        style: TextStyle(
+                                          color: _endDate == null
+                                              ? movigoGreyColor
+                                              : movigoDarkColor,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 18,
+                                        color: movigoGreyColor,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_startDate != null || _endDate != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setModalState(() {
+                                  _startDate = null;
+                                  _endDate = null;
+                                });
                               },
-                              controller: TextEditingController(
-                                text: _maxCost?.toString() ?? '',
+                              icon: Icon(Icons.clear,
+                                  color: movigoPrimaryColor, size: 18),
+                              label: Text(
+                                'Limpiar fechas',
+                                style: TextStyle(
+                                  color: movigoPrimaryColor,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.centerLeft,
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
-                    if (_minCost != null || _maxCost != null)
-                      TextButton(
-                        onPressed: () {
-                          setModalState(() {
-                            _minCost = null;
-                            _maxCost = null;
-                          });
-                        },
-                        child: const Text('Limpiar costos'),
-                      ),
-                  ],
-                ),
+                  ),
 
-                const Spacer(),
+                  const SizedBox(height: 16),
 
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancelar'),
-                      ),
+                  // Filtro por costo
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(movigoButtonRadius),
+                      border: Border.all(color: movigoBorderColor),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _applyFilters();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(_trips.isEmpty
-                                  ? 'No hay resultados con los filtros seleccionados'
-                                  : 'Filtros aplicados: ${_trips.length} viajes encontrados'),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.attach_money, color: movigoPrimaryColor),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Rango de costo',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: movigoDarkColor,
+                              ),
                             ),
-                          );
-                        },
-                        child: const Text('Aplicar'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: _minCost?.toString() ?? '',
+                                decoration: InputDecoration(
+                                  labelText: 'Costo mínimo',
+                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: movigoBorderColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: movigoPrimaryColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  prefixText: 'L. ',
+                                ),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    _minCost = value.isNotEmpty
+                                        ? double.tryParse(value)
+                                        : null;
+                                  });
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: _maxCost?.toString() ?? '',
+                                decoration: InputDecoration(
+                                  labelText: 'Costo máximo',
+                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: movigoBorderColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: movigoPrimaryColor),
+                                    borderRadius: BorderRadius.circular(
+                                        movigoButtonRadius),
+                                  ),
+                                  prefixText: 'L. ',
+                                ),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    _maxCost = value.isNotEmpty
+                                        ? double.tryParse(value)
+                                        : null;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_minCost != null || _maxCost != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: TextButton.icon(
+                              onPressed: () {
+                                setModalState(() {
+                                  _minCost = null;
+                                  _maxCost = null;
+                                });
+                              },
+                              icon: Icon(Icons.clear,
+                                  color: movigoPrimaryColor, size: 18),
+                              label: Text(
+                                'Limpiar costos',
+                                style: TextStyle(
+                                  color: movigoPrimaryColor,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.centerLeft,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // Botones de acción
+                  MovigoButton(
+                    text: 'Aplicar Filtros',
+                    onPressed: () {
+                      _applyFilters();
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(_trips.isEmpty
+                              ? 'No hay resultados con los filtros seleccionados'
+                              : 'Filtros aplicados: ${_trips.length} viajes encontrados'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          color: movigoPrimaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -421,160 +779,188 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
     final vehicleInfo = trip['vehicleInfo'] ?? 'No disponible';
     final estado = trip['statusName'] ?? 'Desconocido';
 
+    // Determinar el color según el estado
+    Color statusColor = _getStatusColor(trip['status']);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Detalles del Viaje',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(movigoBottomSheetRadius),
+        ),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(20),
+            children: [
+              Text(
+                'Detalles del Viaje',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: movigoDarkColor,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            // Wrap most of the content in Expanded + SingleChildScrollView
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Estado del viaje
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(movigoButtonRadius),
+                  border: Border.all(color: statusColor),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Estado del viaje
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(trip['status']),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        estado,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    Icon(
+                      trip['status'] == 4
+                          ? Icons.check_circle
+                          : Icons.info_outline,
+                      color: statusColor,
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // Detalles principales
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildDetailRow('Fecha:',
-                                DateFormat('dd/MM/yyyy').format(fecha)),
-                            const Divider(),
-                            _buildDetailRow(
-                                'Hora:', DateFormat('HH:mm').format(fecha)),
-                            const Divider(),
-                            _buildDetailRow('Origen:', origen),
-                            const Divider(),
-                            _buildDetailRow('Destino:', destino),
-                            const Divider(),
-                            _buildDetailRow('Costo:',
-                                'L. ${(costo is String ? double.tryParse(costo) ?? 0.0 : (costo is num ? costo : 0.0)).toStringAsFixed(2)}'),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Información del conductor
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Conductor',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildDetailRow('Nombre:', driverName),
-                            const Divider(),
-                            _buildDetailRow('Vehículo:', vehicleInfo),
-                          ],
-                        ),
+                    const SizedBox(width: 8),
+                    Text(
+                      estado,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
 
-            // Button at the bottom
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+              const SizedBox(height: 20),
+
+              // Detalles principales
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(movigoButtonRadius),
+                  border: Border.all(color: movigoBorderColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDetailRow(
+                        'Fecha:',
+                        DateFormat('dd/MM/yyyy').format(fecha),
+                        Icons.calendar_today),
+                    const Divider(height: 24),
+                    _buildDetailRow('Hora:', DateFormat('HH:mm').format(fecha),
+                        Icons.access_time),
+                    const Divider(height: 24),
+                    _buildDetailRow('Origen:', origen, Icons.location_on),
+                    const Divider(height: 24),
+                    _buildDetailRow(
+                        'Destino:', destino, Icons.location_searching),
+                    const Divider(height: 24),
+                    _buildDetailRow('Costo:', 'L. ${costo.toStringAsFixed(2)}',
+                        Icons.attach_money),
+                  ],
+                ),
               ),
-              child: const Text('Cerrar'),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              // Información del conductor
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(movigoButtonRadius),
+                  border: Border.all(color: movigoBorderColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Datos del Conductor',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: movigoDarkColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailRow('Nombre:', driverName, Icons.person),
+                    const Divider(height: 24),
+                    _buildDetailRow(
+                        'Vehículo:', vehicleInfo, Icons.directions_car),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Botón de cerrar
+              MovigoButton(
+                text: 'Cerrar',
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-// Método auxiliar para determinar colores según el estado
-  Color _getStatusColor(int? status) {
-    switch (status) {
-      case 1:
-        return Colors.orange; // PENDIENTE
-      case 2:
-        return Colors.blue; // ACEPTADO
-      case 3:
-        return Colors.amber; // EN CURSO
-      case 4:
-        return Colors.green; // COMPLETADO
-      case 5:
-        return Colors.red; // CANCELADO
-      default:
-        return Colors.grey; // Desconocido
-    }
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-              ),
-            ),
+  Widget _buildDetailRow(String label, String value, IconData icon) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: movigoPrimaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-              ),
-            ),
+          child: Icon(
+            icon,
+            color: movigoPrimaryColor,
+            size: 18,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: movigoGreyColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: movigoDarkColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

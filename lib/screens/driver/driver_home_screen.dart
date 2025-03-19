@@ -1,13 +1,15 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/core/constants/api_constants.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import 'package:movigo_frontend/utils/colors.dart';
+import 'package:movigo_frontend/utils/constants.dart';
+import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/driver_service.dart';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/screens/driver/driver_negotiation_screen.dart';
+import 'package:http/http.dart' as http;
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -253,16 +255,24 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MoviGO - Conductor'),
+        backgroundColor: movigoPrimaryColor,
+        elevation: 0,
+        title: const Text(
+          'MoviGO - Conductor',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.history, color: Colors.white),
             onPressed: () {
               RouteHelper.goToDriverHistory(context);
             },
           ),
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () => RouteHelper.goToProfile(context),
           ),
         ],
@@ -271,102 +281,84 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         children: [
           // Banner de viaje activo (solo visible si hay un viaje activo)
           if (_activeTrip != null)
-            GestureDetector(
-              onTap: () {
-                RouteHelper.goToDriverActiveTrip(
-                    context); // Usar el RouteHelper en lugar de Navigator
-              },
-              child: Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                color: Colors.green.shade700,
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.directions_car,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Viaje Activo',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (_activeTrip != null &&
-                              _activeTrip!['destino'] != null)
-                            Text(
-                              'Destino: ${_activeTrip!['destino']}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                        ],
+            Material(
+              color: Colors.green.shade700,
+              elevation: 4,
+              child: InkWell(
+                onTap: () {
+                  RouteHelper.goToDriverActiveTrip(context);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.directions_car,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                    ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Viaje Activo',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (_activeTrip != null &&
+                                _activeTrip!['destino'] != null)
+                              Text(
+                                'Destino: ${_activeTrip!['destino']}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
 
-          // Botón de actualizar (y resto del contenido original)
+          // Botón de actualizar
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: CustomButton(
+            child: MovigoButton(
               text: 'Actualizar Viajes Disponibles',
-              icon: Icons.refresh,
               onPressed: _loadAvailableTrips,
+              isLoading: _isLoading,
             ),
           ),
+
+          // Lista de viajes
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _buildBody(),
           ),
-          // Dentro del Column del body
-          if (_activeTrip != null)
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade700),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.directions_car, color: Colors.green),
-                title: const Text('Viaje Activo',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text(
-                  'Destino: ${_activeTrip?['destino'] ?? 'No disponible'}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    RouteHelper.goToDriverActiveTrip(context);
-                  },
-                  child: const Text('Ver'),
-                ),
-              ),
-            ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => RouteHelper.goToDriverInfo(context),
         tooltip: 'Configuración del conductor',
+        backgroundColor: movigoPrimaryColor,
+        elevation: 4,
         child: const Icon(Icons.settings),
       ),
     );
@@ -385,24 +377,34 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.directions_car,
-            size: 64,
-            color: Colors.grey[400],
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Icon(
+              Icons.directions_car_outlined,
+              size: 50,
+              color: movigoGreyColor,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             'No hay viajes disponibles',
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[600],
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: movigoDarkColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Los viajes pendientes aparecerán aquí',
             style: TextStyle(
-              color: Colors.grey[500],
+              fontSize: 16,
+              color: movigoGreyColor,
             ),
           ),
         ],
@@ -425,11 +427,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
           margin: const EdgeInsets.only(bottom: 16),
           elevation: 3,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(movigoButtonRadius),
           ),
           child: InkWell(
             onTap: () => _showTripDetails(trip),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(movigoButtonRadius),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -439,10 +441,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(12),
+                          color: movigoPrimaryColor,
+                          borderRadius:
+                              BorderRadius.circular(movigoButtonRadius),
                         ),
                         child: const Text(
                           'PENDIENTE',
@@ -459,10 +462,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                       if (tienePrecioPropuesto)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                              horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(12),
+                            color: movigoSecondaryColor,
+                            borderRadius:
+                                BorderRadius.circular(movigoButtonRadius),
                           ),
                           child: Text(
                             'L. $precioPropuesto',
@@ -478,12 +482,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, color: Colors.green),
+                      Icon(Icons.location_on, color: Colors.green),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['origen'] ?? 'Origen no disponible',
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: movigoDarkColor,
+                          ),
                         ),
                       ),
                     ],
@@ -491,12 +498,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_searching, color: Colors.red),
+                      Icon(Icons.location_searching, color: Colors.red),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['destino'] ?? 'Destino no disponible',
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: movigoDarkColor,
+                          ),
                         ),
                       ),
                     ],
@@ -504,13 +514,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.person_outline),
+                      Icon(Icons.person_outline, color: movigoGreyColor),
                       const SizedBox(width: 8),
                       Text(
                         trip['Usuario'] != null
                             ? '${trip['Usuario']['nombre']} ${trip['Usuario']['apellido']}'
                             : 'Pasajero',
-                        style: const TextStyle(fontSize: 14),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: movigoGreyColor,
+                        ),
                       ),
                       const Spacer(),
 
@@ -520,7 +533,20 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                           height: 36,
                           child: ElevatedButton(
                             onPressed: () => _navegarANegociacion(trip),
-                            child: const Text('Negociar'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: movigoSecondaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(movigoButtonRadius),
+                              ),
+                            ),
+                            child: const Text(
+                              'Negociar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         )
                       else
@@ -528,7 +554,20 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                           height: 36,
                           child: ElevatedButton(
                             onPressed: () => _acceptTrip(trip),
-                            child: const Text('Aceptar'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: movigoPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(movigoButtonRadius),
+                              ),
+                            ),
+                            child: const Text(
+                              'Aceptar',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                     ],
@@ -554,6 +593,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     );
   }
 
+// Método alternativo que abre una pantalla completa en lugar de un modal
   void _showTripDetails(Map<String, dynamic> trip) {
     final tienePrecioPropuesto = trip['estado_negociacion'] == 'propuesto';
     final precioPropuesto = trip['precio_propuesto']?.toString() ?? '0.00';
@@ -561,111 +601,173 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Detalles del Viaje',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDetailRow('Estado:', 'PENDIENTE'),
-                  const Divider(),
-
-                  // Mostrar precio propuesto si existe
-                  if (tienePrecioPropuesto) ...[
-                    _buildDetailRow('Precio propuesto:', 'L. $precioPropuesto'),
-                    const Divider(),
-                  ],
-
-                  _buildDetailRow('Origen:', trip['origen'] ?? 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow(
-                      'Destino:', trip['destino'] ?? 'No disponible'),
-                  const Divider(),
-                  _buildDetailRow(
-                      'Pasajero:',
-                      trip['Usuario'] != null
-                          ? '${trip['Usuario']['nombre']} ${trip['Usuario']['apellido']}'
-                          : 'No disponible'),
-                ],
-              ),
-            ),
-            const Spacer(),
-
-            // Botón según si hay precio propuesto o no
-            if (tienePrecioPropuesto)
-              CustomButton(
-                text: 'Negociar Precio',
-                onPressed: () {
-                  Navigator.pop(context); // Cierra el modal
-                  _navegarANegociacion(trip); // Navega a negociación
-                },
-              )
-            else
-              CustomButton(
-                text: 'Aceptar Viaje',
-                onPressed: () {
-                  Navigator.pop(context); // Cierra el modal
-                  _acceptTrip(trip); // Acepta el viaje y navega
-                },
-              ),
-
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text('Cancelar'),
-            ),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(movigoBottomSheetRadius)),
       ),
+      builder: (context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(20),
+              children: [
+                // Título con estilo MoviGO
+                Text(
+                  'Detalles del Viaje',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: movigoDarkColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+
+                // Contenedor de detalles con estilo MoviGO
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(movigoButtonRadius),
+                    border: Border.all(color: movigoBorderColor),
+                  ),
+                  child: Column(
+                    children: [
+                      // Estado
+                      _buildDetailRow(
+                          'Estado:', 'PENDIENTE', Icons.info_outline),
+                      const Divider(height: 24),
+
+                      // Precio propuesto si existe
+                      if (tienePrecioPropuesto) ...[
+                        _buildDetailRow('Precio propuesto:',
+                            'L. $precioPropuesto', Icons.attach_money),
+                        const Divider(height: 24),
+                      ],
+
+                      // Origen
+                      _buildDetailRow('Origen:',
+                          trip['origen'] ?? 'No disponible', Icons.location_on),
+                      const Divider(height: 24),
+
+                      // Destino
+                      _buildDetailRow(
+                          'Destino:',
+                          trip['destino'] ?? 'No disponible',
+                          Icons.location_searching),
+                      const Divider(height: 24),
+
+                      // Pasajero
+                      _buildDetailRow(
+                          'Pasajero:',
+                          trip['Usuario'] != null
+                              ? '${trip['Usuario']['nombre']} ${trip['Usuario']['apellido']}'
+                              : 'No disponible',
+                          Icons.person_outline),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Botón principal con estilo MoviGO
+                MovigoButton(
+                  text: tienePrecioPropuesto
+                      ? 'Negociar Precio'
+                      : 'Aceptar Viaje',
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (tienePrecioPropuesto) {
+                      _navegarANegociacion(trip);
+                    } else {
+                      _acceptTrip(trip);
+                    }
+                  },
+                  color: tienePrecioPropuesto
+                      ? movigoSecondaryColor
+                      : movigoPrimaryColor,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Botón cancelar con estilo MoviGO
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(
+                        color: movigoPrimaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Margen adicional para prevenir desbordamientos
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black54,
-              ),
-            ),
+  Widget _buildDetailRow(String label, String value, IconData icon) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: movigoPrimaryColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: Colors.black87,
-              ),
-            ),
+          child: Icon(
+            icon,
+            color: movigoPrimaryColor,
+            size: 18,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: movigoGreyColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: movigoDarkColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
