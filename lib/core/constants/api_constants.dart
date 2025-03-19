@@ -1,6 +1,6 @@
 // lib/core/constants/api_constants.dart
 class ApiConstants {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'https://movigo-service.onrender.com/api';
 
   // Auth endpoints
   static const String login = '/auth/login';

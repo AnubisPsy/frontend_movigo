@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.movigo_frontend"
+    namespace 'com.movigo.nb_utils'
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

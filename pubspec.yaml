@@ -39,7 +39,7 @@ dependencies:
   intl: ^0.18.1
   socket_io_client: ^2.0.0
   url_launcher: ^6.1.10
-  nb_utils: ^4.6.25
+  connectivity_plus: ^5.0.2
 
   # Añadir estas dependencias para el mapa
   flutter_map: ^3.1.0
