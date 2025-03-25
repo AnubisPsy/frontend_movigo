@@ -27,12 +27,14 @@ class AuthService {
     }
   }
 
+// Modificación del método register en AuthService
   static Future<Map<String, dynamic>> register({
     required String email,
     required String password,
     required String nombre,
     required String apellido,
     required String rol,
+    String? telefono, // Parámetro opcional de teléfono
   }) async {
     try {
       final response = await http.post(
@@ -44,6 +46,7 @@ class AuthService {
           'nombre': nombre,
           'apellido': apellido,
           'rol': int.parse(rol),
+          'telefono': telefono, // Incluir teléfono en la petición
         }),
       );
 

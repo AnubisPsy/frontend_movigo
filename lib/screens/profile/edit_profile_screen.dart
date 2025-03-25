@@ -19,6 +19,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
   final _emailController = TextEditingController();
+  final _telefonoController =
+      TextEditingController(); // Nuevo controlador para teléfono
   bool _isLoading = false;
 
   @override
@@ -30,6 +32,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _nombreController.text = userData['nombre'] ?? '';
       _apellidoController.text = userData['apellido'] ?? '';
       _emailController.text = userData['email'] ?? '';
+      _telefonoController.text =
+          userData['telefono'] ?? ''; // Cargar el teléfono
     }
   }
 
@@ -152,6 +156,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
+                const SizedBox(height: 20),
+
+                // Campo de teléfono (nuevo)
+                MovigoTextField(
+                  hintText: 'Teléfono',
+                  controller: _telefonoController,
+                  prefixIcon: Icons.phone,
+                  keyboardType: TextInputType.phone,
+                ),
+
                 const SizedBox(height: 30),
 
                 // Información de privacidad
@@ -185,7 +199,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tu correo electrónico se utilizará solo para verificar tu identidad y enviarte notificaciones importantes relacionadas con tus viajes.',
+                        'Tu correo electrónico y teléfono se utilizarán solo para verificar tu identidad y enviarte notificaciones importantes relacionadas con tus viajes.',
                         style: TextStyle(
                           color: Colors.blue.shade800,
                           fontSize: 14,
@@ -235,6 +249,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return false;
     }
 
+    // Validar teléfono
+    if (_telefonoController.text.isEmpty) {
+      _showError('Por favor ingresa tu número telefónico');
+      return false;
+    }
+
+    // Validar formato de teléfono (opcional)
+    final phoneRegExp = RegExp(r'^\+?[0-9]{8,}$');
+    if (!phoneRegExp.hasMatch(_telefonoController.text)) {
+      _showError(
+          'Por favor ingresa un número telefónico válido (mínimo 8 dígitos)');
+      return false;
+    }
+
     return true;
   }
 
@@ -267,6 +295,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         nombre: _nombreController.text,
         apellido: _apellidoController.text,
         email: _emailController.text,
+        telefono:
+            _telefonoController.text, // Añadir teléfono a la actualización
       );
 
       if (mounted) {
@@ -300,7 +330,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return userData != null &&
         (_nombreController.text != userData['nombre'] ||
             _apellidoController.text != userData['apellido'] ||
-            _emailController.text != userData['email']);
+            _emailController.text != userData['email'] ||
+            _telefonoController.text !=
+                userData['telefono']); // Añadir teléfono a la verificación
   }
 
   Future<void> _showDiscardChangesDialog() async {
@@ -372,6 +404,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _nombreController.dispose();
     _apellidoController.dispose();
     _emailController.dispose();
+    _telefonoController.dispose();
     super.dispose();
   }
 }

@@ -19,6 +19,8 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
   final _emailController = TextEditingController();
+  final _telefonoController =
+      TextEditingController(); // Nuevo controlador para teléfono
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -30,6 +32,8 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
     _nombreController.dispose();
     _apellidoController.dispose();
     _emailController.dispose();
+    _telefonoController
+        .dispose(); // Liberar recurso del controlador de teléfono
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -45,6 +49,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
           password: _passwordController.text,
           nombre: _nombreController.text,
           apellido: _apellidoController.text,
+          telefono: _telefonoController.text, // Añadir teléfono
           rol: _selectedRole,
         );
 
@@ -111,6 +116,20 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
     final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegExp.hasMatch(_emailController.text)) {
       _showError('Por favor ingresa un correo electrónico válido');
+      return;
+    }
+
+    // Validación del teléfono
+    if (_telefonoController.text.isEmpty) {
+      _showError('Por favor ingresa tu número telefónico');
+      return;
+    }
+
+    // Validar formato de teléfono (opcional, puedes ajustar según el formato esperado)
+    final phoneRegExp = RegExp(r'^\+?[0-9]{8,}$');
+    if (!phoneRegExp.hasMatch(_telefonoController.text)) {
+      _showError(
+          'Por favor ingresa un número telefónico válido (mínimo 8 dígitos)');
       return;
     }
 
@@ -231,6 +250,16 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
                   controller: _emailController,
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
+                ),
+
+                const SizedBox(height: 16),
+
+                // Teléfono (nuevo campo)
+                MovigoTextField(
+                  hintText: 'Teléfono',
+                  controller: _telefonoController,
+                  prefixIcon: Icons.phone,
+                  keyboardType: TextInputType.phone,
                 ),
 
                 const SizedBox(height: 16),

@@ -41,6 +41,7 @@ class ProfileService {
     required String nombre,
     required String apellido,
     required String email,
+    required String telefono,
   }) async {
     try {
       final userData = JwtDecoder.decode(token);
@@ -56,6 +57,7 @@ class ProfileService {
           'nombre': nombre,
           'apellido': apellido,
           'email': email,
+          'telefono': telefono, // Incluir teléfono en la petición
         }),
       );
 
