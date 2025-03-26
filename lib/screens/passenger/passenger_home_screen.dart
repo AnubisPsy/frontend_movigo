@@ -55,43 +55,118 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
 
     // Obtener el ID del usuario
     final userId = await StorageService.getUserId();
+    print("Inicializando WebSocket para usuario: $userId");
 
     if (userId != null) {
       // Suscribirse a eventos del usuario
       SocketService.subscribeToUserEvents(userId);
+      print("Suscrito a eventos para usuario: $userId");
 
       // Registrar handlers para diferentes tipos de eventos
       SocketService.on('viaje-aceptado', _handleViajeAceptado);
       SocketService.on('viaje-iniciado', _handleViajeIniciado);
       SocketService.on('viaje-completado', _handleViajeCompletado);
       SocketService.on('viaje-cancelado', _handleViajeCancelado);
+
+      print("Handlers de WebSocket registrados correctamente");
+    } else {
+      print("ERROR: No se pudo obtener el ID del usuario para WebSocket");
     }
   }
 
   void _handleViajeAceptado(dynamic data) {
     print('📱 Viaje aceptado recibido: $data');
     if (data != null && mounted) {
+      // Imprimir datos completos para verificar la estructura
+      print("Datos completos del viaje aceptado: $data");
+      print("Estado antes de actualizar: ${_activeTrip?['estado']}");
+
+      // Convertir data a un mapa si no lo es ya
+      Map<String, dynamic> dataMap;
+      if (data is Map<String, dynamic>) {
+        dataMap = data;
+      } else {
+        dataMap = Map<String, dynamic>.from(data);
+      }
+
       setState(() {
-        _activeTrip = Map<String, dynamic>.from(data);
+        // IMPORTANTE: Verificar que los datos del conductor estén presentes
+        if (dataMap['Conductor'] != null) {
+          print("✅ Datos del conductor presentes en la actualización");
+        } else {
+          print("⚠️ Datos del conductor AUSENTES en la actualización");
+        }
+
+        _activeTrip = dataMap;
       });
+
+      print("Estado después de actualizar: ${_activeTrip?['estado']}");
+
+      // Mostrar un mensaje para confirmar la actualización
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Un conductor ha aceptado tu viaje!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      print('⚠️ Datos de viaje aceptado nulos o widget no montado');
     }
   }
 
   void _handleViajeIniciado(dynamic data) {
     print('📱 Viaje iniciado recibido: $data');
     if (data != null && mounted) {
+      // Imprimir datos completos para verificar la estructura
+      print("Datos completos del viaje iniciado: $data");
+      print("Estado antes de actualizar: ${_activeTrip?['estado']}");
+
       setState(() {
         _activeTrip = Map<String, dynamic>.from(data);
       });
+
+      print("Estado después de actualizar: ${_activeTrip?['estado']}");
+
+      // Forzar la reconstrucción del UI
+      setState(() {});
+
+      // Mostrar un mensaje para confirmar la actualización
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('¡Tu viaje ha comenzado!'),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      print('⚠️ Datos de viaje iniciado nulos o widget no montado');
     }
   }
 
   void _handleViajeCompletado(dynamic data) {
     print('📱 Viaje completado recibido: $data');
     if (data != null && mounted) {
+      // Imprimir los datos para depuración
+      print("Datos completos del viaje completado: $data");
+
       setState(() {
         _activeTrip = null; // Limpiamos el viaje activo
         _refreshTimer?.cancel(); // Detener el timer de actualización
+      });
+
+      Future.delayed(Duration(milliseconds: 500), () {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MovigoTripCompletedScreen(
+                tripData: data,
+                isConductor: false,
+              ),
+            ),
+          );
+        }
       });
 
       // Navegar a la pantalla de viaje completado
@@ -104,6 +179,8 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           ),
         ),
       );
+    } else {
+      print('⚠️ Datos de viaje completado nulos o widget no montado');
     }
   }
 
@@ -194,38 +271,91 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
     // Cancelar cualquier timer anterior
     _refreshTimer?.cancel();
 
-    // Usar un intervalo más largo (10 segundos) como respaldo a WebSockets
-    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+    // Usar un intervalo más corto (5 segundos) para una actualización más responsiva
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (mounted) _refreshTripStatus();
     });
+
+    print("⏰ Timer de actualización iniciado (cada 5 segundos)");
   }
 
   Future<void> _refreshTripStatus() async {
     if (_activeTrip == null || !mounted) return;
 
     try {
-      print("Consultando estado actual del viaje ID: ${_activeTrip!['id']}");
       final tripId = _activeTrip!['id'];
+      print("⏰ Refrescando estado del viaje ID: $tripId");
+
+      // Guardar datos importantes que no queremos perder
+      final conductorActual = _activeTrip!['Conductor'];
+      final vehiculoActual = _activeTrip!['Vehiculo'];
+
       final updatedTrip = await _passengerService.getTripById(tripId);
 
       if (!mounted) return;
 
       if (updatedTrip != null) {
-        print(
-            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${updatedTrip['estado']}");
+        final oldState = _activeTrip!['estado'];
+        final newState = updatedTrip['estado'];
+
+        print("⏰ Estado actual: $oldState, Nuevo estado: $newState");
+
+        // Preservar la información del conductor
+        if (updatedTrip['Conductor'] == null && conductorActual != null) {
+          print("⚠️ Preservando datos del conductor que se perderían");
+          updatedTrip['Conductor'] = conductorActual;
+        }
+
+        // Preservar la información del vehículo
+        if (updatedTrip['Vehiculo'] == null && vehiculoActual != null) {
+          print("⚠️ Preservando datos del vehículo que se perderían");
+          updatedTrip['Vehiculo'] = vehiculoActual;
+        }
 
         setState(() {
           _activeTrip = updatedTrip;
         });
+
+        // Mostrar mensaje solo si hay cambio de estado
+        if (oldState != newState) {
+          String mensaje = "";
+
+          switch (newState) {
+            case 2:
+              mensaje = "¡Un conductor ha aceptado tu viaje!";
+              break;
+            case 3:
+              mensaje = "¡Tu viaje ha comenzado!";
+              break;
+            case 4:
+              mensaje = "¡Viaje completado!";
+              break;
+            case 5:
+              mensaje = "Viaje cancelado";
+              break;
+          }
+
+          if (mensaje.isNotEmpty && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(mensaje),
+                backgroundColor: newState == 5 ? Colors.red : Colors.green,
+              ),
+            );
+          }
+        }
       } else {
-        print("El viaje ya no existe o no se pudo obtener");
-        // Si el viaje ya no existe, limpiar estado
-        setState(() {
-          _activeTrip = null;
-        });
+        print("⏰ El viaje ya no existe o no se pudo obtener");
+        // No eliminamos el viaje si no podemos obtener una actualización
+        // Solo hacemos esto si estamos seguros de que el viaje se canceló
+        /*
+      setState(() {
+        _activeTrip = null;
+      });
+      */
       }
     } catch (e) {
-      print('Error al actualizar estado del viaje: $e');
+      print('⏰ Error al actualizar estado del viaje: $e');
     }
   }
 
@@ -406,28 +536,55 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
   }
 
   Widget _buildActiveTripPanel() {
-    // Determinar el estado del viaje
-    int estado = _activeTrip!['estado'] ?? 1;
+    if (_activeTrip == null) {
+      print("ERROR: _activeTrip es nulo en _buildActiveTripPanel");
+      return Container();
+    }
+
+    // Obtener y verificar el estado
+    int estado;
+
+    // Asegurar que el estado sea un entero
+    if (_activeTrip!['estado'] is int) {
+      estado = _activeTrip!['estado'];
+    } else if (_activeTrip!['estado'] is String) {
+      estado = int.tryParse(_activeTrip!['estado']) ?? 1;
+    } else {
+      // Si no es ninguno de los anteriores, usar valor por defecto
+      estado = 1;
+    }
+
+    print(
+        "Estado en _buildActiveTripPanel: $estado (tipo: ${_activeTrip!['estado'].runtimeType})");
+
+    // Determinar el texto de estado
     String statusText = '';
+    Color statusColor;
 
     switch (estado) {
       case 1:
         statusText = 'Esperando conductor...';
+        statusColor = Colors.orange;
         break;
       case 2:
         statusText = 'Conductor asignado';
+        statusColor = Colors.blue;
         break;
       case 3:
         statusText = 'En camino';
+        statusColor = movigoSecondaryColor;
         break;
       case 4:
         statusText = 'Viaje completado';
+        statusColor = Colors.green;
         break;
       case 5:
         statusText = 'Viaje cancelado';
+        statusColor = Colors.red;
         break;
       default:
         statusText = 'Estado desconocido';
+        statusColor = Colors.grey;
     }
 
     return Container(
@@ -446,12 +603,21 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            statusText,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: movigoDarkColor,
+          // Indicador de estado con color
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(color: statusColor),
+            ),
+            child: Text(
+              statusText,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: statusColor,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -510,11 +676,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     setState(() {
                       _activeTrip = null;
                       _isLoading = false;
-                      _refreshTimer
-                          ?.cancel(); // Detener el timer de actualización
+                      _refreshTimer?.cancel();
                     });
 
-                    // Mostrar diálogo después de cancelar el viaje exitosamente
                     _showCanceledDialog();
                   } else {
                     setState(() => _isLoading = false);
@@ -544,7 +708,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           // Si hay conductor asignado, mostrar su información
           if (estado >= 2 &&
               estado <= 4 &&
-              _activeTrip!['conductor_id'] != null) ...[
+              _activeTrip!['Conductor'] != null) ...[
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 16),
@@ -575,8 +739,11 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Usar la información del conductor desde el objeto Conductor
                         Text(
-                          _activeTrip!['conductor'] ?? 'Conductor',
+                          _activeTrip!['Conductor'] != null
+                              ? "${_activeTrip!['Conductor']['nombre']} ${_activeTrip!['Conductor']['apellido'] ?? ''}"
+                              : "Conductor",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -585,7 +752,9 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _activeTrip!['vehiculo'] ?? 'Vehículo',
+                          _activeTrip!['Vehiculo'] != null
+                              ? "${_activeTrip!['Vehiculo']['marca']} ${_activeTrip!['Vehiculo']['modelo']} - ${_activeTrip!['Vehiculo']['placa'] ?? ''} (${_activeTrip!['Vehiculo']['color'] ?? ''})"
+                              : "Vehículo",
                           style: TextStyle(
                             color: movigoGreyColor,
                             fontSize: 14,
@@ -605,6 +774,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                       icon: const Icon(Icons.phone,
                           color: Colors.white, size: 20),
                       onPressed: () {
+                        // Lógica para llamar al conductor
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Llamando al conductor...'),

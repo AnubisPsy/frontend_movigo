@@ -246,10 +246,24 @@ class PassengerService {
     }
   }
 
+  Future<void> saveActiveTrip(Map<String, dynamic> trip) async {
+    return _saveActiveTrip(trip);
+  }
+
   // Métodos para manejar el almacenamiento local de viajes activos
   Future<void> _saveActiveTrip(Map<String, dynamic> trip) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('active_trip', jsonEncode(trip));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Depurar los datos que se están guardando
+      print("💾 Guardando datos de viaje en almacenamiento local");
+      print("💾 Conductor presente: ${trip['Conductor'] != null}");
+      print("💾 Vehículo presente: ${trip['Vehiculo'] != null}");
+
+      await prefs.setString('active_trip', jsonEncode(trip));
+    } catch (e) {
+      print("Error al guardar viaje activo: $e");
+    }
   }
 
   Future<void> _removeActiveTrip() async {

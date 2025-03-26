@@ -69,12 +69,20 @@ class MovigoTripCompletedScreen extends StatelessWidget {
       print('Duración calculada (minutos): $minutos');
     }
 
-    // Datos del conductor o pasajero (según corresponda)
-    final nombreConductor = tripData['conductor'] ?? 'No disponible';
-    final vehiculo = tripData['vehiculo'] ?? 'No disponible';
+// En la función build de MovigoTripCompletedScreen
+
+// Datos del conductor o pasajero (según corresponda)
+    final nombreConductor = tripData['Conductor'] != null
+        ? "${tripData['Conductor']['nombre']} ${tripData['Conductor']['apellido']}"
+        : (tripData['conductor'] ?? 'No disponible');
+
+    final vehiculo = tripData['Vehiculo'] != null
+        ? "${tripData['Vehiculo']['marca']} ${tripData['Vehiculo']['modelo']} - ${tripData['Vehiculo']['placa']} (${tripData['Vehiculo']['color']})"
+        : (tripData['vehiculo'] ?? 'No disponible');
+
     final nombrePasajero = tripData['Usuario'] != null
-        ? '${tripData['Usuario']['nombre']} ${tripData['Usuario']['apellido']}'
-        : 'No disponible';
+        ? "${tripData['Usuario']['nombre']} ${tripData['Usuario']['apellido']}"
+        : (tripData['pasajero'] ?? 'No disponible');
 
     // Precio y datos de pago
     final costoNumerico = tripData['costo'] is String

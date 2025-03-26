@@ -123,6 +123,15 @@ class _MovigoDriverActiveTripScreenState
 
       if (!mounted) return;
 
+      if (activeTrip != null) {
+        // Imprimir la estructura completa para depuración
+        print("Viaje activo encontrado: ${activeTrip['id']}");
+        print("Datos completos del viaje: $activeTrip");
+        print("Datos del Usuario: ${activeTrip['Usuario']}");
+      } else {
+        print("No se encontró ningún viaje activo");
+      }
+
       setState(() {
         _activeTrip = activeTrip;
         _isLoading = false;
@@ -143,6 +152,7 @@ class _MovigoDriverActiveTripScreenState
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
+      print('Error detallado al cargar viaje: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar viaje: ${e.toString()}')),
       );
@@ -157,46 +167,6 @@ class _MovigoDriverActiveTripScreenState
     _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (mounted) _refreshTripStatus();
     });
-  }
-
-  Future<void> _refreshTripStatus() async {
-    if (_activeTrip == null || !mounted) return;
-
-    try {
-      final tripId = _activeTrip!['id'];
-
-      print("Refrescando estado del viaje ID: $tripId");
-
-      // Obtener el estado actual del viaje mediante una llamada específica
-      final response = await _driverService.getTripById(tripId);
-
-      if (!mounted) return;
-
-      if (response != null) {
-        print(
-            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${response['estado']}");
-
-        setState(() {
-          _activeTrip = response;
-        });
-
-        // Si el viaje ya fue completado o cancelado (estados 4 o 5)
-        if (response['estado'] == 4 || response['estado'] == 5) {
-          _refreshTimer?.cancel();
-
-          if (response['estado'] == 4) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Viaje completado'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      print('Error al actualizar estado del viaje: $e');
-    }
   }
 
   Future<void> _startTrip() async {
@@ -413,6 +383,16 @@ class _MovigoDriverActiveTripScreenState
         ? double.tryParse(precio) ?? 0.0
         : (precio is num ? precio.toDouble() : 0.0);
 
+// Extraer datos del pasajero correctamente
+    final usuarioData = _activeTrip!['Usuario'];
+    final nombrePasajero = usuarioData != null
+        ? "${usuarioData['nombre']} ${usuarioData['apellido'] ?? ''}".trim()
+        : 'Pasajero';
+// Modificar esta línea para comprobar si el teléfono existe en los datos
+    final telefonoPasajero = usuarioData != null &&
+            (usuarioData['telefono'] != null || usuarioData['phone'] != null)
+        ? (usuarioData['telefono'] ?? usuarioData['phone']).toString()
+        : 'Sin teléfono';
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -522,19 +502,14 @@ class _MovigoDriverActiveTripScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _activeTrip!['pasajero'] ?? 'Pasajero',
+                            nombrePasajero,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: movigoDarkColor,
                             ),
                           ),
                           Text(
-                            _activeTrip!['telefono_pasajero'] != null &&
-                                    _activeTrip!['telefono_pasajero']
-                                        .toString()
-                                        .isNotEmpty
-                                ? _activeTrip!['telefono_pasajero']
-                                : 'Sin teléfono',
+                            telefonoPasajero,
                             style: TextStyle(
                               color: movigoGreyColor,
                             ),
@@ -546,15 +521,13 @@ class _MovigoDriverActiveTripScreenState
                       icon: const Icon(Icons.phone),
                       color: movigoPrimaryColor,
                       onPressed: () async {
-                        final telefono = _activeTrip!['telefono_pasajero'];
-                        if (telefono != null &&
-                            telefono.toString().isNotEmpty) {
+                        if (telefonoPasajero != 'Sin teléfono') {
                           final Uri url =
-                              Uri(scheme: 'tel', path: telefono.toString());
+                              Uri(scheme: 'tel', path: telefonoPasajero);
                           if (await canLaunchUrl(url)) {
-                            // Asegúrate de tener la importación correcta
                             await launchUrl(url);
                           } else {
+                            if (!mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('No se pudo realizar la llamada'),
@@ -595,5 +568,62 @@ class _MovigoDriverActiveTripScreenState
         ],
       ),
     );
+  }
+
+// También actualiza el método _refreshTripStatus para agregar depuración
+  Future<void> _refreshTripStatus() async {
+    if (_activeTrip == null || !mounted) return;
+
+    try {
+      final tripId = _activeTrip!['id'];
+      print("Refrescando estado del viaje ID: $tripId");
+
+      // Guardar datos importantes que no queremos perder
+      final usuarioActual = _activeTrip!['Usuario'];
+      final vehiculoActual = _activeTrip!['Vehiculo'];
+
+      // Obtener el estado actual del viaje mediante una llamada específica
+      final response = await _driverService.getTripById(tripId);
+
+      if (!mounted) return;
+
+      if (response != null) {
+        print(
+            "Estado actual: ${_activeTrip!['estado']}, Nuevo estado: ${response['estado']}");
+
+        // Verificar si la respuesta tiene datos del usuario
+        if (response['Usuario'] == null && usuarioActual != null) {
+          print(
+              "Preservando datos del usuario que se perderían en la actualización");
+          response['Usuario'] = usuarioActual;
+        }
+
+        // Verificar si la respuesta tiene datos del vehículo
+        if (response['Vehiculo'] == null && vehiculoActual != null) {
+          print(
+              "Preservando datos del vehículo que se perderían en la actualización");
+          response['Vehiculo'] = vehiculoActual;
+        }
+
+        setState(() {
+          _activeTrip = response;
+        });
+        // Si el viaje ya fue completado o cancelado (estados 4 o 5)
+        if (response['estado'] == 4 || response['estado'] == 5) {
+          _refreshTimer?.cancel();
+
+          if (response['estado'] == 4) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Viaje completado'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print('Error al actualizar estado del viaje: $e');
+    }
   }
 }
