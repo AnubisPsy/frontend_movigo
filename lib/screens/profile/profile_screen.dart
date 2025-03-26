@@ -218,6 +218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Divider(height: 20),
                   _buildInfoRow(
                       'Email', _userData?['email'] ?? '', Icons.email),
+                  const Divider(height: 20),
+                  _buildInfoRow('Teléfono',
+                      _userData?['telefono'] ?? 'No especificado', Icons.phone),
                 ],
               ),
             ),

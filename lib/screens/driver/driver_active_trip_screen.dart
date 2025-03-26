@@ -9,6 +9,7 @@ import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MovigoDriverActiveTripScreen extends StatefulWidget {
   const MovigoDriverActiveTripScreen({Key? key}) : super(key: key);
@@ -406,6 +407,12 @@ class _MovigoDriverActiveTripScreenState
         statusColor = Colors.grey;
     }
 
+    // Formatea el precio correctamente
+    final precio = _activeTrip!['tarifa'] ?? 0.0;
+    final precioFormateado = precio is String
+        ? double.tryParse(precio) ?? 0.0
+        : (precio is num ? precio.toDouble() : 0.0);
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -438,6 +445,7 @@ class _MovigoDriverActiveTripScreenState
             ),
             child: Column(
               children: [
+                // Cabecera con estado y precio
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -460,7 +468,7 @@ class _MovigoDriverActiveTripScreenState
                       ),
                     ),
                     Text(
-                      'L. ${(_activeTrip!['tarifa'] ?? 0.0).toStringAsFixed(2)}',
+                      'L. ${precioFormateado.toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -498,8 +506,10 @@ class _MovigoDriverActiveTripScreenState
                   ],
                 ),
                 const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 8),
 
-                // Información del pasajero
+                // Información del pasajero con teléfono
                 Row(
                   children: [
                     CircleAvatar(
@@ -519,7 +529,12 @@ class _MovigoDriverActiveTripScreenState
                             ),
                           ),
                           Text(
-                            _activeTrip!['telefono_pasajero'] ?? 'Sin teléfono',
+                            _activeTrip!['telefono_pasajero'] != null &&
+                                    _activeTrip!['telefono_pasajero']
+                                        .toString()
+                                        .isNotEmpty
+                                ? _activeTrip!['telefono_pasajero']
+                                : 'Sin teléfono',
                             style: TextStyle(
                               color: movigoGreyColor,
                             ),
@@ -530,12 +545,30 @@ class _MovigoDriverActiveTripScreenState
                     IconButton(
                       icon: const Icon(Icons.phone),
                       color: movigoPrimaryColor,
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Función de llamada en desarrollo'),
-                          ),
-                        );
+                      onPressed: () async {
+                        final telefono = _activeTrip!['telefono_pasajero'];
+                        if (telefono != null &&
+                            telefono.toString().isNotEmpty) {
+                          final Uri url =
+                              Uri(scheme: 'tel', path: telefono.toString());
+                          if (await canLaunchUrl(url)) {
+                            // Asegúrate de tener la importación correcta
+                            await launchUrl(url);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No se pudo realizar la llamada'),
+                              ),
+                            );
+                          }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('No hay número de teléfono disponible'),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],
