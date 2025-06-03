@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 // Constantes de diseño
 const double movigoButtonRadius = 4.0;

@@ -169,13 +169,13 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: movigoDarkColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Registro',
           style: TextStyle(
             color: movigoDarkColor,
@@ -187,7 +187,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/login');
             },
-            child: Text(
+            child: const Text(
               'Iniciar Sesión',
               style: TextStyle(
                 color: movigoPrimaryColor,
@@ -205,7 +205,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Crear Cuenta',
                   style: TextStyle(
                     fontSize: 28,
@@ -216,7 +216,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
 
                 const SizedBox(height: 8),
 
-                Text(
+                const Text(
                   'Completa tus datos para crear una cuenta',
                   style: TextStyle(
                     fontSize: 16,
@@ -285,7 +285,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
                 const SizedBox(height: 24),
 
                 // Selector de rol
-                Text(
+                const Text(
                   'Tipo de cuenta',
                   style: TextStyle(
                     fontSize: 16,
@@ -314,7 +314,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
                           });
                         },
                       ),
-                      Divider(height: 1, color: movigoBorderColor),
+                      const Divider(height: 1, color: movigoBorderColor),
                       RadioListTile<String>(
                         title: const Text('Conductor'),
                         value: '2',
@@ -334,7 +334,7 @@ class _MovigoRegisterScreenState extends State<MovigoRegisterScreen> {
 
                 // Términos y condiciones
                 RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                     text: 'Al hacer clic en "Registrarse" aceptas nuestros ',
                     style: TextStyle(color: movigoGreyColor),
                     children: <TextSpan>[

@@ -4,7 +4,6 @@ import 'package:movigo_frontend/utils/constants.dart';
 import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
 
 class MovigoResetPasswordScreen extends StatefulWidget {
   const MovigoResetPasswordScreen({Key? key}) : super(key: key);
@@ -121,13 +120,13 @@ class _MovigoResetPasswordScreenState extends State<MovigoResetPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: movigoDarkColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Nueva Contraseña',
           style: TextStyle(
             color: movigoDarkColor,
@@ -154,7 +153,7 @@ class _MovigoResetPasswordScreenState extends State<MovigoResetPasswordScreen> {
                       color: movigoSecondaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.lock_open,
                       size: 50,
                       color: movigoSecondaryColor,
@@ -165,7 +164,7 @@ class _MovigoResetPasswordScreenState extends State<MovigoResetPasswordScreen> {
                 const SizedBox(height: 30),
 
                 // Título y descripción
-                Text(
+                const Text(
                   'Crea tu nueva contraseña',
                   style: TextStyle(
                     fontSize: 24,
@@ -176,7 +175,7 @@ class _MovigoResetPasswordScreenState extends State<MovigoResetPasswordScreen> {
 
                 const SizedBox(height: 12),
 
-                Text(
+                const Text(
                   'Tu nueva contraseña debe ser diferente a la anterior y tener al menos 6 caracteres.',
                   style: TextStyle(
                     fontSize: 16,
@@ -216,7 +215,7 @@ class _MovigoResetPasswordScreenState extends State<MovigoResetPasswordScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'La contraseña debe:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,

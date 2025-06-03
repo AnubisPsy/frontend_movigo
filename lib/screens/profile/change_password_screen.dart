@@ -73,7 +73,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       color: movigoPrimaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.lock_reset,
                       size: 50,
                       color: movigoPrimaryColor,
@@ -84,7 +84,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 const SizedBox(height: 30),
 
                 // Título y descripción
-                Text(
+                const Text(
                   'Actualiza tu contraseña',
                   style: TextStyle(
                     fontSize: 24,
@@ -95,7 +95,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 const SizedBox(height: 12),
 
-                Text(
+                const Text(
                   'Ingresa tu contraseña actual y la nueva contraseña que deseas utilizar.',
                   style: TextStyle(
                     fontSize: 16,
@@ -144,7 +144,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'La contraseña debe:',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,

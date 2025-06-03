@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
 import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:intl/intl.dart';
@@ -142,7 +141,7 @@ class MovigoTripCompletedScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       'Costo Total: L. $costo',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: movigoPrimaryColor,
@@ -279,7 +278,7 @@ class MovigoTripCompletedScreen extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: movigoDarkColor,

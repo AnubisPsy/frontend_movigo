@@ -122,7 +122,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       // Primero obtenemos todos los viajes
       String url = '${ApiConstants.baseUrl}/viajes';
-      print("getActiveTrip: Consultando ${url}");
+      print("getActiveTrip: Consultando $url");
 
       final response = await http.get(
         Uri.parse(url),
@@ -384,14 +384,14 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(50),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.directions_car_outlined,
               size: 50,
               color: movigoGreyColor,
             ),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'No hay viajes disponibles',
             style: TextStyle(
               fontSize: 20,
@@ -400,7 +400,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Los viajes pendientes aparecerán aquí',
             style: TextStyle(
               fontSize: 16,
@@ -482,12 +482,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.green),
+                      const Icon(Icons.location_on, color: Colors.green),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['origen'] ?? 'Origen no disponible',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: movigoDarkColor,
                           ),
@@ -498,12 +498,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.location_searching, color: Colors.red),
+                      const Icon(Icons.location_searching, color: Colors.red),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['destino'] ?? 'Destino no disponible',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: movigoDarkColor,
                           ),
@@ -514,13 +514,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.person_outline, color: movigoGreyColor),
+                      const Icon(Icons.person_outline, color: movigoGreyColor),
                       const SizedBox(width: 8),
                       Text(
                         trip['Usuario'] != null
                             ? '${trip['Usuario']['nombre']} ${trip['Usuario']['apellido']}'
                             : 'Pasajero',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           color: movigoGreyColor,
                         ),
@@ -619,7 +619,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               padding: const EdgeInsets.all(20),
               children: [
                 // Título con estilo MoviGO
-                Text(
+                const Text(
                   'Detalles del Viaje',
                   style: TextStyle(
                     fontSize: 24,
@@ -705,7 +705,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Cancelar',
                       style: TextStyle(
                         color: movigoPrimaryColor,
@@ -750,7 +750,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: movigoGreyColor,
                 ),
@@ -758,7 +758,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: movigoDarkColor,

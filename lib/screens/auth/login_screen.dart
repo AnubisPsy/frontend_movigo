@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
 import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
@@ -109,7 +108,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
+                    const Text(
                       'MoviGO!',
                       style: TextStyle(
                         fontSize: 32,
@@ -118,7 +117,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Viajes seguros y confiables',
                       style: TextStyle(
                         fontSize: 16,
@@ -132,7 +131,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
               const SizedBox(height: 50),
 
               // Formulario de inicio de sesión
-              Text(
+              const Text(
                 'Iniciar Sesión',
                 style: TextStyle(
                   fontSize: 24,
@@ -163,7 +162,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: _goToForgotPassword,
-                  child: Text(
+                  child: const Text(
                     'Olvidé mi contraseña',
                     style: TextStyle(
                       color: movigoPrimaryColor,
@@ -193,7 +192,7 @@ class _MovigoLoginScreenState extends State<MovigoLoginScreen> {
                     const Text('¿No tienes cuenta?'),
                     TextButton(
                       onPressed: _goToRegister,
-                      child: Text(
+                      child: const Text(
                         'Regístrate',
                         style: TextStyle(
                           color: movigoPrimaryColor,

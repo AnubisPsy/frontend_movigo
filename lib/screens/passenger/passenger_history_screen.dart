@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:movigo_frontend/utils/colors.dart';
 import 'package:movigo_frontend/utils/constants.dart';
 import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/trip/trip_card.dart';
 import 'package:movigo_frontend/core/navigation/route_helper.dart';
 import 'package:movigo_frontend/data/services/passenger_service.dart';
 import 'package:intl/intl.dart';
@@ -154,7 +153,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -179,7 +178,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(50),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.history,
               size: 50,
               color: movigoGreyColor,
@@ -190,7 +189,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             _filtersApplied
                 ? 'No hay viajes que coincidan con los filtros'
                 : 'No hay viajes en tu historial',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: movigoDarkColor,
@@ -201,7 +200,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             _filtersApplied
                 ? 'Intenta con otros filtros'
                 : 'Tus viajes completados aparecerán aquí',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               color: movigoGreyColor,
             ),
@@ -266,7 +265,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                         const Spacer(),
                         Text(
                           DateFormat('dd/MM/yyyy').format(trip['date']),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: movigoGreyColor,
                             fontSize: 14,
                           ),
@@ -276,12 +275,12 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Icon(Icons.location_on, color: Colors.green),
+                        const Icon(Icons.location_on, color: Colors.green),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             trip['origin'] ?? 'Origen no disponible',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               color: movigoDarkColor,
                             ),
@@ -292,12 +291,12 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.location_searching, color: Colors.red),
+                        const Icon(Icons.location_searching, color: Colors.red),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             trip['destination'] ?? 'Destino no disponible',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               color: movigoDarkColor,
                             ),
@@ -310,11 +309,11 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.person_outline, color: movigoGreyColor),
+                            const Icon(Icons.person_outline, color: movigoGreyColor),
                             const SizedBox(width: 8),
                             Text(
                               trip['driverName'] ?? 'Conductor',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 color: movigoGreyColor,
                               ),
@@ -324,7 +323,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                         const Spacer(),
                         Text(
                           'L. ${trip['cost'].toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: movigoPrimaryColor,
@@ -399,7 +398,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  Text(
+                  const Text(
                     'Filtrar viajes',
                     style: TextStyle(
                       fontSize: 24,
@@ -421,10 +420,10 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.date_range, color: movigoPrimaryColor),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Rango de fechas',
                               style: TextStyle(
@@ -449,7 +448,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                     builder: (context, child) {
                                       return Theme(
                                         data: Theme.of(context).copyWith(
-                                          colorScheme: ColorScheme.light(
+                                          colorScheme: const ColorScheme.light(
                                             primary: movigoPrimaryColor,
                                             onPrimary: Colors.white,
                                           ),
@@ -490,7 +489,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                               : movigoDarkColor,
                                         ),
                                       ),
-                                      Icon(
+                                      const Icon(
                                         Icons.calendar_today_outlined,
                                         size: 18,
                                         color: movigoGreyColor,
@@ -512,7 +511,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                     builder: (context, child) {
                                       return Theme(
                                         data: Theme.of(context).copyWith(
-                                          colorScheme: ColorScheme.light(
+                                          colorScheme: const ColorScheme.light(
                                             primary: movigoPrimaryColor,
                                             onPrimary: Colors.white,
                                           ),
@@ -553,7 +552,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                               : movigoDarkColor,
                                         ),
                                       ),
-                                      Icon(
+                                      const Icon(
                                         Icons.calendar_today_outlined,
                                         size: 18,
                                         color: movigoGreyColor,
@@ -575,9 +574,9 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                   _endDate = null;
                                 });
                               },
-                              icon: Icon(Icons.clear,
+                              icon: const Icon(Icons.clear,
                                   color: movigoPrimaryColor, size: 18),
-                              label: Text(
+                              label: const Text(
                                 'Limpiar fechas',
                                 style: TextStyle(
                                   color: movigoPrimaryColor,
@@ -606,10 +605,10 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.attach_money, color: movigoPrimaryColor),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Rango de costo',
                               style: TextStyle(
@@ -628,20 +627,20 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                 initialValue: _minCost?.toString() ?? '',
                                 decoration: InputDecoration(
                                   labelText: 'Costo mínimo',
-                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  labelStyle: const TextStyle(color: movigoGreyColor),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 16,
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoBorderColor),
+                                        const BorderSide(color: movigoBorderColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoPrimaryColor),
+                                        const BorderSide(color: movigoPrimaryColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
@@ -663,20 +662,20 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                 initialValue: _maxCost?.toString() ?? '',
                                 decoration: InputDecoration(
                                   labelText: 'Costo máximo',
-                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  labelStyle: const TextStyle(color: movigoGreyColor),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 16,
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoBorderColor),
+                                        const BorderSide(color: movigoBorderColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoPrimaryColor),
+                                        const BorderSide(color: movigoPrimaryColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
@@ -704,9 +703,9 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                                   _maxCost = null;
                                 });
                               },
-                              icon: Icon(Icons.clear,
+                              icon: const Icon(Icons.clear,
                                   color: movigoPrimaryColor, size: 18),
-                              label: Text(
+                              label: const Text(
                                 'Limpiar costos',
                                 style: TextStyle(
                                   color: movigoPrimaryColor,
@@ -750,7 +749,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Cancelar',
                         style: TextStyle(
                           color: movigoPrimaryColor,
@@ -802,7 +801,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             shrinkWrap: true,
             padding: const EdgeInsets.all(20),
             children: [
-              Text(
+              const Text(
                 'Detalles del Viaje',
                 style: TextStyle(
                   fontSize: 24,
@@ -888,7 +887,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Datos del Conductor',
                       style: TextStyle(
                         fontSize: 18,
@@ -943,7 +942,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: movigoGreyColor,
                 ),
@@ -951,7 +950,7 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: movigoDarkColor,

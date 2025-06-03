@@ -5,6 +5,7 @@ import 'package:movigo_frontend/utils/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovigoAlertDialog extends StatelessWidget {
+  @override
   final Key? key;
 
   const MovigoAlertDialog({this.key}) : super(key: key);
@@ -37,7 +38,7 @@ class MovigoAlertDialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     'Nombre del Conductor',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: movigoDarkColor),
@@ -54,9 +55,9 @@ class MovigoAlertDialog extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   RichText(
-                    text: TextSpan(
+                    text: const TextSpan(
                       text: 'ST3571 ',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -80,7 +81,7 @@ class MovigoAlertDialog extends StatelessWidget {
                     color: movigoSecondaryColor,
                     borderRadius: BorderRadius.circular(100)),
                 child: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.phone,
                     color: Colors.white,
                   ),
@@ -96,12 +97,12 @@ class MovigoAlertDialog extends StatelessWidget {
               )
             ],
           ),
-          Divider(height: 20),
+          const Divider(height: 20),
           Text(
             'Tu conductor ha llegado. Por favor prepárate en los próximos 5 minutos.',
             style: TextStyle(color: Colors.grey[600]),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: movigoPrimaryColor,
@@ -114,7 +115,7 @@ class MovigoAlertDialog extends StatelessWidget {
               Navigator.pop(context);
               // Aquí puedes navegar a la pantalla de respuesta
             },
-            child: Text('RESPONDER',
+            child: const Text('RESPONDER',
                 style: TextStyle(
                     fontWeight: FontWeight.bold, color: Colors.white)),
           ),

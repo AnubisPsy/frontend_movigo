@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
 import 'package:movigo_frontend/widgets/movigo_button.dart';
 import 'package:movigo_frontend/widgets/movigo_text_field.dart';
 import 'package:movigo_frontend/data/services/auth_service.dart';
@@ -87,13 +86,13 @@ class _MovigoForgotPasswordScreenState
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: movigoDarkColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Recuperar Contraseña',
           style: TextStyle(
             color: movigoDarkColor,
@@ -120,7 +119,7 @@ class _MovigoForgotPasswordScreenState
                       color: movigoPrimaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.lock_reset,
                       size: 50,
                       color: movigoPrimaryColor,
@@ -131,7 +130,7 @@ class _MovigoForgotPasswordScreenState
                 const SizedBox(height: 30),
 
                 // Título y descripción
-                Text(
+                const Text(
                   '¿Olvidaste tu contraseña?',
                   style: TextStyle(
                     fontSize: 24,
@@ -142,7 +141,7 @@ class _MovigoForgotPasswordScreenState
 
                 const SizedBox(height: 12),
 
-                Text(
+                const Text(
                   'Ingresa tu correo electrónico para recibir un código de verificación y poder restablecer tu contraseña.',
                   style: TextStyle(
                     fontSize: 16,
@@ -175,7 +174,7 @@ class _MovigoForgotPasswordScreenState
                 Center(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(
+                    child: const Text(
                       'Volver a Iniciar Sesión',
                       style: TextStyle(
                         color: movigoPrimaryColor,

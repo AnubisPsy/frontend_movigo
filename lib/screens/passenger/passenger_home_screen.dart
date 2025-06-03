@@ -9,7 +9,6 @@ import 'dart:async';
 import 'package:movigo_frontend/data/services/socket_service.dart';
 import 'package:movigo_frontend/data/services/storage_service.dart';
 import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
-import 'package:movigo_frontend/screens/passenger/trip_price_screen.dart';
 import 'package:movigo_frontend/screens/passenger/trip_confirmation_screen.dart';
 import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 
@@ -155,7 +154,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
         _refreshTimer?.cancel(); // Detener el timer de actualización
       });
 
-      Future.delayed(Duration(milliseconds: 500), () {
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           Navigator.push(
             context,
@@ -403,7 +402,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
 
             // Panel inferior que cambia según estado
             if (_isLoading)
-              Center(
+              const Center(
                 child: CircularProgressIndicator(
                   color: movigoPrimaryColor,
                 ),
@@ -431,7 +430,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               Navigator.pop(context); // Cerrar el diálogo
               RouteHelper.goToPassengerHome(context); // Redirigir al home
             },
-            child: Text(
+            child: const Text(
               'Aceptar',
               style: TextStyle(color: movigoPrimaryColor),
             ),
@@ -457,7 +456,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
               Navigator.pop(context); // Cerrar el diálogo
               RouteHelper.goToPassengerHome(context); // Redirigir al home
             },
-            child: Text(
+            child: const Text(
               'Aceptar',
               style: TextStyle(color: movigoPrimaryColor),
             ),
@@ -625,12 +624,12 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           // Información de origen y destino
           Row(
             children: [
-              Icon(Icons.location_on, color: Colors.green),
+              const Icon(Icons.location_on, color: Colors.green),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   _activeTrip!['origen'] ?? 'Origen no disponible',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: movigoDarkColor,
                   ),
@@ -641,12 +640,12 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.location_searching, color: Colors.red),
+              const Icon(Icons.location_searching, color: Colors.red),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   _activeTrip!['destino'] ?? 'Destino no disponible',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: movigoDarkColor,
                   ),
@@ -728,7 +727,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                       color: movigoPrimaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
                       color: movigoPrimaryColor,
                       size: 30,
@@ -744,7 +743,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                           _activeTrip!['Conductor'] != null
                               ? "${_activeTrip!['Conductor']['nombre']} ${_activeTrip!['Conductor']['apellido'] ?? ''}"
                               : "Conductor",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: movigoDarkColor,
@@ -755,7 +754,7 @@ class _PassengerHomeScreenState extends State<PassengerHomeScreen> {
                           _activeTrip!['Vehiculo'] != null
                               ? "${_activeTrip!['Vehiculo']['marca']} ${_activeTrip!['Vehiculo']['modelo']} - ${_activeTrip!['Vehiculo']['placa'] ?? ''} (${_activeTrip!['Vehiculo']['color'] ?? ''})"
                               : "Vehículo",
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: movigoGreyColor,
                             fontSize: 14,
                           ),

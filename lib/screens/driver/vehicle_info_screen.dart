@@ -183,7 +183,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
         ),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -205,7 +205,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                           color: movigoPrimaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(50),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.directions_car,
                           size: 50,
                           color: movigoPrimaryColor,
@@ -216,7 +216,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                     const SizedBox(height: 30),
 
                     // Título y descripción
-                    Text(
+                    const Text(
                       'Datos del Vehículo',
                       style: TextStyle(
                         fontSize: 24,
@@ -227,7 +227,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
 
                     const SizedBox(height: 12),
 
-                    Text(
+                    const Text(
                       'Por favor completa la información de tu vehículo para poder brindar un mejor servicio.',
                       style: TextStyle(
                         fontSize: 16,
@@ -292,7 +292,7 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.info_outline,
                                 color: Colors.blue,
                                 size: 20,

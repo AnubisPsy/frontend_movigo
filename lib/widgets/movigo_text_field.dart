@@ -31,7 +31,7 @@ class MovigoTextField extends StatelessWidget {
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: movigoGreyColor),
+          hintStyle: const TextStyle(color: movigoGreyColor),
           prefixIcon: prefixIcon != null
               ? Icon(prefixIcon, color: movigoPrimaryColor)
               : null,

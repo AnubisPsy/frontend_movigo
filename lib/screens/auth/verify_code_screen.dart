@@ -160,13 +160,13 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: movigoDarkColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Verificar Código',
           style: TextStyle(
             color: movigoDarkColor,
@@ -190,7 +190,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
                   color: movigoPrimaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(50),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.verified_user,
                   size: 50,
                   color: movigoPrimaryColor,
@@ -200,7 +200,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
               const SizedBox(height: 30),
 
               // Título y descripción
-              Text(
+              const Text(
                 'Ingresa el código de verificación',
                 style: TextStyle(
                   fontSize: 24,
@@ -214,7 +214,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
 
               Text(
                 'Hemos enviado un código de 6 dígitos a tu correo electrónico ${_email ?? ''}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: movigoGreyColor,
                 ),
@@ -236,7 +236,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: movigoDarkColor,
@@ -247,13 +247,13 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
                         enabledBorder: OutlineInputBorder(
                           borderRadius:
                               BorderRadius.circular(movigoButtonRadius),
-                          borderSide: BorderSide(color: movigoBorderColor),
+                          borderSide: const BorderSide(color: movigoBorderColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius:
                               BorderRadius.circular(movigoButtonRadius),
                           borderSide:
-                              BorderSide(color: movigoPrimaryColor, width: 2),
+                              const BorderSide(color: movigoPrimaryColor, width: 2),
                         ),
                         filled: true,
                         fillColor: Colors.white,
@@ -288,7 +288,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     '¿No recibiste el código?',
                     style: TextStyle(
                       color: movigoGreyColor,
@@ -296,7 +296,7 @@ class _MovigoVerifyCodeScreenState extends State<MovigoVerifyCodeScreen> {
                   ),
                   TextButton(
                     onPressed: _resendCode,
-                    child: Text(
+                    child: const Text(
                       'Reenviar',
                       style: TextStyle(
                         color: movigoPrimaryColor,

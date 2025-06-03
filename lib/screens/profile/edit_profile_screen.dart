@@ -79,7 +79,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         backgroundColor: movigoPrimaryColor.withOpacity(0.1),
                         child: Text(
                           _getUserInitials(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
                             color: movigoPrimaryColor,
@@ -111,7 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(height: 30),
 
                 // Título y descripción
-                Text(
+                const Text(
                   'Editar información personal',
                   style: TextStyle(
                     fontSize: 24,
@@ -122,7 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                 const SizedBox(height: 12),
 
-                Text(
+                const Text(
                   'Actualiza tus datos personales y pulsa guardar para confirmar los cambios.',
                   style: TextStyle(
                     fontSize: 16,
@@ -181,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.info_outline,
                             color: Colors.blue,
                             size: 20,
@@ -339,7 +339,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
+        title: const Text(
           'Cambios sin guardar',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -350,7 +350,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
+            child: const Text(
               'Cancelar',
               style: TextStyle(
                 color: movigoPrimaryColor,

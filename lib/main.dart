@@ -10,7 +10,6 @@ import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
 import 'package:movigo_frontend/screens/passenger/passenger_home_screen.dart';
 import 'package:movigo_frontend/screens/passenger/passenger_history_screen.dart';
 import 'package:movigo_frontend/screens/passenger/trip_price_screen.dart';
-import 'package:movigo_frontend/screens/passenger/trip_confirmation_screen.dart';
 
 // Pantallas de conductor
 import 'package:movigo_frontend/screens/driver/vehicle_info_screen.dart';

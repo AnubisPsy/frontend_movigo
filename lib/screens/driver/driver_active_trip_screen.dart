@@ -324,7 +324,7 @@ class _MovigoDriverActiveTripScreenState
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'No hay viaje activo',
             style: TextStyle(
               fontSize: 22,
@@ -333,7 +333,7 @@ class _MovigoDriverActiveTripScreenState
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'No se encontró ningún viaje en estado activo',
             style: TextStyle(
               color: movigoGreyColor,
@@ -449,7 +449,7 @@ class _MovigoDriverActiveTripScreenState
                     ),
                     Text(
                       'L. ${precioFormateado.toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: movigoDarkColor,
@@ -462,7 +462,7 @@ class _MovigoDriverActiveTripScreenState
                 // Información de origen y destino
                 Row(
                   children: [
-                    Icon(Icons.location_on, color: Colors.green),
+                    const Icon(Icons.location_on, color: Colors.green),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -475,7 +475,7 @@ class _MovigoDriverActiveTripScreenState
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.location_searching, color: Colors.red),
+                    const Icon(Icons.location_searching, color: Colors.red),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -503,14 +503,14 @@ class _MovigoDriverActiveTripScreenState
                         children: [
                           Text(
                             nombrePasajero,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: movigoDarkColor,
                             ),
                           ),
                           Text(
                             telefonoPasajero,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: movigoGreyColor,
                             ),
                           ),

@@ -46,7 +46,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
         ),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -66,7 +66,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
                           color: movigoPrimaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(50),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.confirmation_num,
                           size: 50,
                           color: movigoPrimaryColor,
@@ -77,7 +77,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
                     const SizedBox(height: 30),
 
                     // Título y descripción
-                    Text(
+                    const Text(
                       'Confirma tu viaje',
                       style: TextStyle(
                         fontSize: 24,
@@ -88,7 +88,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
 
                     const SizedBox(height: 12),
 
-                    Text(
+                    const Text(
                       'Revisa los detalles de tu viaje antes de continuar.',
                       style: TextStyle(
                         fontSize: 16,
@@ -109,7 +109,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Detalles del Viaje',
                             style: TextStyle(
                               fontSize: 18,
@@ -141,7 +141,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.info_outline,
                                 color: Colors.blue,
                                 size: 20,
@@ -215,7 +215,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: movigoGreyColor,
                 ),
@@ -223,7 +223,7 @@ class _TripConfirmationScreenState extends State<TripConfirmationScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: movigoDarkColor,

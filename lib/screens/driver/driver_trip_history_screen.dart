@@ -155,7 +155,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -180,7 +180,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(50),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.history,
               size: 50,
               color: movigoGreyColor,
@@ -191,7 +191,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             _filtersApplied
                 ? 'No hay viajes que coincidan con los filtros'
                 : 'No hay viajes en tu historial',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: movigoDarkColor,
@@ -202,7 +202,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             _filtersApplied
                 ? 'Intenta con otros filtros'
                 : 'Tus viajes completados aparecerán aquí',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               color: movigoGreyColor,
             ),
@@ -294,7 +294,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                       const Spacer(),
                       Text(
                         DateFormat('dd/MM/yyyy').format(tripDate),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: movigoGreyColor,
                           fontSize: 14,
                         ),
@@ -304,12 +304,12 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.location_on, color: Colors.green),
+                      const Icon(Icons.location_on, color: Colors.green),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['origen'] ?? 'Origen no disponible',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: movigoDarkColor,
                           ),
@@ -320,12 +320,12 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.location_searching, color: Colors.red),
+                      const Icon(Icons.location_searching, color: Colors.red),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['destino'] ?? 'Destino no disponible',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: movigoDarkColor,
                           ),
@@ -336,12 +336,12 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.person_outline, color: movigoGreyColor),
+                      const Icon(Icons.person_outline, color: movigoGreyColor),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           trip['pasajero'] ?? 'Pasajero',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             color: movigoGreyColor,
                           ),
@@ -349,7 +349,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                       ),
                       Text(
                         'L. ${(trip['tarifa'] ?? 0.0).toStringAsFixed(2)}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: movigoPrimaryColor,
@@ -389,7 +389,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  Text(
+                  const Text(
                     'Filtrar viajes',
                     style: TextStyle(
                       fontSize: 24,
@@ -411,10 +411,10 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.date_range, color: movigoPrimaryColor),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Rango de fechas',
                               style: TextStyle(
@@ -439,7 +439,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                     builder: (context, child) {
                                       return Theme(
                                         data: Theme.of(context).copyWith(
-                                          colorScheme: ColorScheme.light(
+                                          colorScheme: const ColorScheme.light(
                                             primary: movigoPrimaryColor,
                                             onPrimary: Colors.white,
                                           ),
@@ -480,7 +480,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                               : movigoDarkColor,
                                         ),
                                       ),
-                                      Icon(
+                                      const Icon(
                                         Icons.calendar_today_outlined,
                                         size: 18,
                                         color: movigoGreyColor,
@@ -502,7 +502,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                     builder: (context, child) {
                                       return Theme(
                                         data: Theme.of(context).copyWith(
-                                          colorScheme: ColorScheme.light(
+                                          colorScheme: const ColorScheme.light(
                                             primary: movigoPrimaryColor,
                                             onPrimary: Colors.white,
                                           ),
@@ -543,7 +543,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                               : movigoDarkColor,
                                         ),
                                       ),
-                                      Icon(
+                                      const Icon(
                                         Icons.calendar_today_outlined,
                                         size: 18,
                                         color: movigoGreyColor,
@@ -565,9 +565,9 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                   _endDate = null;
                                 });
                               },
-                              icon: Icon(Icons.clear,
+                              icon: const Icon(Icons.clear,
                                   color: movigoPrimaryColor, size: 18),
-                              label: Text(
+                              label: const Text(
                                 'Limpiar fechas',
                                 style: TextStyle(
                                   color: movigoPrimaryColor,
@@ -596,10 +596,10 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Icon(Icons.attach_money, color: movigoPrimaryColor),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Rango de tarifa',
                               style: TextStyle(
@@ -618,20 +618,20 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                 initialValue: _minCost?.toString() ?? '',
                                 decoration: InputDecoration(
                                   labelText: 'Tarifa mínima',
-                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  labelStyle: const TextStyle(color: movigoGreyColor),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 16,
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoBorderColor),
+                                        const BorderSide(color: movigoBorderColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoPrimaryColor),
+                                        const BorderSide(color: movigoPrimaryColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
@@ -653,20 +653,20 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                 initialValue: _maxCost?.toString() ?? '',
                                 decoration: InputDecoration(
                                   labelText: 'Tarifa máxima',
-                                  labelStyle: TextStyle(color: movigoGreyColor),
+                                  labelStyle: const TextStyle(color: movigoGreyColor),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 12,
                                     horizontal: 16,
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoBorderColor),
+                                        const BorderSide(color: movigoBorderColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: movigoPrimaryColor),
+                                        const BorderSide(color: movigoPrimaryColor),
                                     borderRadius: BorderRadius.circular(
                                         movigoButtonRadius),
                                   ),
@@ -694,9 +694,9 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                                   _maxCost = null;
                                 });
                               },
-                              icon: Icon(Icons.clear,
+                              icon: const Icon(Icons.clear,
                                   color: movigoPrimaryColor, size: 18),
-                              label: Text(
+                              label: const Text(
                                 'Limpiar tarifas',
                                 style: TextStyle(
                                   color: movigoPrimaryColor,
@@ -740,7 +740,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Cancelar',
                         style: TextStyle(
                           color: movigoPrimaryColor,
@@ -820,7 +820,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             shrinkWrap: true,
             padding: const EdgeInsets.all(20),
             children: [
-              Text(
+              const Text(
                 'Detalles del Viaje',
                 style: TextStyle(
                   fontSize: 24,
@@ -909,7 +909,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Datos del Pasajero',
                       style: TextStyle(
                         fontSize: 18,
@@ -980,7 +980,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: movigoGreyColor,
                 ),
@@ -988,7 +988,7 @@ class _DriverTripHistoryScreenState extends State<DriverTripHistoryScreen> {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: movigoDarkColor,

@@ -93,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -109,13 +109,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.error_outline,
             size: 60,
             color: Colors.red,
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'No se pudo cargar la información',
             style: TextStyle(
               fontSize: 18,
@@ -126,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           Text(
             _error ?? 'Error desconocido',
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.red,
             ),
             textAlign: TextAlign.center,
@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: movigoPrimaryColor.withOpacity(0.1),
                     child: Text(
                       _getUserInitials(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
                         color: movigoPrimaryColor,
@@ -168,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   Text(
                     '${_userData?['nombre'] ?? ''} ${_userData?['apellido'] ?? ''}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: movigoDarkColor,
@@ -177,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     _userData?['rol'] == '1' ? 'Pasajero' : 'Conductor',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: movigoSecondaryColor,
                       fontWeight: FontWeight.w500,
@@ -281,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(width: 10),
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: movigoDarkColor,
@@ -318,7 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: movigoGreyColor,
                   ),
@@ -326,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: movigoDarkColor,
@@ -352,7 +352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
+        title: const Text(
           'Cerrar Sesión',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -363,7 +363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
+            child: const Text(
               'Cancelar',
               style: TextStyle(
                 color: movigoPrimaryColor,

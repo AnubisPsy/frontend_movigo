@@ -223,13 +223,13 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: movigoDarkColor,
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Negociar Precio',
           style: TextStyle(
             color: movigoDarkColor,
@@ -254,7 +254,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                           color: movigoSecondaryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(50),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.handshake,
                           size: 50,
                           color: movigoSecondaryColor,
@@ -267,7 +267,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                     // Título según el estado de negociación
                     Text(
                       _getTitleForState(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: movigoDarkColor,
@@ -279,7 +279,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                     // Descripción
                     Text(
                       _getDescriptionForState(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: movigoGreyColor,
                       ),
@@ -291,7 +291,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                     Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(movigoButtonRadius),
-                        side: BorderSide(color: movigoBorderColor, width: 1),
+                        side: const BorderSide(color: movigoBorderColor, width: 1),
                       ),
                       elevation: 0,
                       child: Padding(
@@ -299,7 +299,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Detalles del Viaje',
                               style: TextStyle(
                                 fontSize: 18,
@@ -357,7 +357,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                               const SizedBox(height: 12),
                               Text(
                                 'L. ${_precioPropuesto?.toStringAsFixed(2) ?? "0.00"}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: movigoPrimaryColor,
@@ -378,7 +378,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                       const SizedBox(height: 24),
 
                       // Proponer tu precio
-                      Text(
+                      const Text(
                         'Propone tu precio:',
                         style: TextStyle(
                           fontSize: 18,
@@ -405,7 +405,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                               onPressed: _salirSinRechazar,
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: movigoPrimaryColor,
-                                side: BorderSide(color: movigoPrimaryColor),
+                                side: const BorderSide(color: movigoPrimaryColor),
                                 shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(movigoButtonRadius),
@@ -413,7 +413,7 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Cancelar',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -500,19 +500,19 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                               const SizedBox(height: 12),
                               Text(
                                 'L. ${_tripData?['precio_final']?.toString() ?? "0.00"}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green,
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              Row(
+                              const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.check_circle, color: Colors.green),
-                                  const SizedBox(width: 8),
-                                  const Text(
+                                  SizedBox(width: 8),
+                                  Text(
                                     '¡El pasajero ha aceptado tu contraoferta!',
                                     style: TextStyle(color: Colors.green),
                                   ),
@@ -542,8 +542,8 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                         ),
                         color: Colors.red.shade50,
                         elevation: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
                           child: Column(
                             children: [
                               Text(
@@ -554,13 +554,13 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
                                   color: Colors.red,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.cancel, color: Colors.red),
-                                  const SizedBox(width: 8),
-                                  const Text(
+                                  SizedBox(width: 8),
+                                  Text(
                                     'La propuesta de precio ha sido rechazada',
                                     style: TextStyle(color: Colors.red),
                                   ),
@@ -610,14 +610,14 @@ class _DriverNegotiationScreenState extends State<DriverNegotiationScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: movigoGreyColor,
                 ),
               ),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: movigoDarkColor,

@@ -88,7 +88,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(
+        title: const Text(
           'Contraoferta Recibida',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -99,7 +99,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            const Text(
               'El conductor ha contrapropuesto un precio de:',
               style: TextStyle(color: movigoGreyColor),
               textAlign: TextAlign.center,
@@ -115,7 +115,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
               ),
               child: Text(
                 'L. ${_precioContrapropuesto?.toStringAsFixed(2) ?? "0.00"}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: movigoSecondaryColor,
@@ -138,7 +138,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                     Navigator.pop(context); // Cerrar diálogo
                     _rechazarContrapropuesta();
                   },
-                  child: Text(
+                  child: const Text(
                     'Rechazar',
                     style: TextStyle(
                       color: Colors.red,
@@ -333,7 +333,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: movigoGreyColor,
                   ),
@@ -341,7 +341,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: movigoDarkColor,
@@ -379,7 +379,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
         ),
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
                 color: movigoPrimaryColor,
               ),
@@ -401,7 +401,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Detalles del Viaje',
                             style: TextStyle(
                               fontSize: 18,
@@ -435,7 +435,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                             color: movigoSecondaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(40),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.attach_money,
                             size: 40,
                             color: movigoSecondaryColor,
@@ -443,7 +443,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Text(
+                      const Text(
                         'Propón un precio para tu viaje',
                         style: TextStyle(
                           fontSize: 20,
@@ -453,7 +453,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'Ingresa la cantidad que estás dispuesto a pagar por este viaje',
                         style: TextStyle(
                           fontSize: 16,
@@ -543,7 +543,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                         ),
                       ),
                       const SizedBox(height: 30),
-                      Text(
+                      const Text(
                         'El conductor evaluará tu oferta. Este proceso puede tardar unos minutos.',
                         style: TextStyle(
                           color: movigoGreyColor,
@@ -556,7 +556,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: movigoPrimaryColor,
-                          side: BorderSide(color: movigoPrimaryColor),
+                          side: const BorderSide(color: movigoPrimaryColor),
                           shape: RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(movigoButtonRadius),
@@ -587,14 +587,14 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                                 color: movigoSecondaryColor.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Icons.handshake_outlined,
                                 size: 30,
                                 color: movigoSecondaryColor,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            Text(
+                            const Text(
                               'Contraoferta del Conductor',
                               style: TextStyle(
                                 fontSize: 18,
@@ -605,14 +605,14 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                             const SizedBox(height: 8),
                             Text(
                               'L. ${_precioContrapropuesto?.toStringAsFixed(2) ?? "0.00"}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: movigoSecondaryColor,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            Text(
+                            const Text(
                               'El conductor ha propuesto un nuevo precio para tu viaje',
                               style: TextStyle(
                                 color: movigoGreyColor,
@@ -768,7 +768,7 @@ class _TripPriceScreenState extends State<TripPriceScreen> {
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 8),
-                            Text(
+                            const Text(
                               'Puedes intentar con un nuevo viaje o con otro conductor.',
                               style: TextStyle(
                                 color: movigoGreyColor,
