@@ -1,7 +1,7 @@
 // lib/components/movigo_alert_dialog.dart
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
+import '../utils/colors.dart';
+import '../utils/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovigoAlertDialog extends StatelessWidget {

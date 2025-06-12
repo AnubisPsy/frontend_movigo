@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/data/services/passenger_service.dart';
-import 'package:movigo_frontend/screens/passenger/trip_price_screen.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../data/services/passenger_service.dart';
+import '../../screens/passenger/trip_price_screen.dart';
+import '../../core/navigation/route_helper.dart';
 
 class TripConfirmationScreen extends StatefulWidget {
   final String origin;
   final String destination;
 
   const TripConfirmationScreen({
-    Key? key,
+    super.key,
     required this.origin,
     required this.destination,
-  }) : super(key: key);
+  });
 
   @override
   State<TripConfirmationScreen> createState() => _TripConfirmationScreenState();

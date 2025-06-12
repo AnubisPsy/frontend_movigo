@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
 
 class MovigoTextField extends StatelessWidget {
   final String hintText;
@@ -10,13 +10,13 @@ class MovigoTextField extends StatelessWidget {
   final TextInputType keyboardType;
 
   const MovigoTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.controller,
     this.isPassword = false,
     this.prefixIcon,
     this.keyboardType = TextInputType.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

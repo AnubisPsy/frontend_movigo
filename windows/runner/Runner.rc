@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "movigo_frontend" "\0"
+            VALUE "FileDescription", "frontend_movigo" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "movigo_frontend" "\0"
+            VALUE "InternalName", "frontend_movigo" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "movigo_frontend.exe" "\0"
-            VALUE "ProductName", "movigo_frontend" "\0"
+            VALUE "OriginalFilename", "frontend_movigo.exe" "\0"
+            VALUE "ProductName", "frontend_movigo" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

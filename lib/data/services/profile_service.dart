@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:movigo_frontend/core/constants/api_constants.dart';
+import '../../core/constants/api_constants.dart';
 
 class ProfileService {
   static Future<Map<String, dynamic>> getUserProfile(String token) async {

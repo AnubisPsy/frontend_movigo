@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/data/services/auth_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../../utils/colors.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../../widgets/movigo_text_field.dart';
+import '../../data/services/auth_service.dart';
+import '../../data/services/storage_service.dart';
+import '../../core/navigation/route_helper.dart';
 
 class MovigoLoginScreen extends StatefulWidget {
-  const MovigoLoginScreen({Key? key}) : super(key: key);
+  const MovigoLoginScreen({super.key});
 
   @override
   State<MovigoLoginScreen> createState() => _MovigoLoginScreenState();

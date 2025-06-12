@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../../utils/colors.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../core/navigation/route_helper.dart';
 import 'package:intl/intl.dart';
 
 class MovigoTripCompletedScreen extends StatelessWidget {
@@ -9,10 +9,10 @@ class MovigoTripCompletedScreen extends StatelessWidget {
   final bool isConductor;
 
   const MovigoTripCompletedScreen({
-    Key? key,
+    super.key,
     required this.tripData,
     this.isConductor = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

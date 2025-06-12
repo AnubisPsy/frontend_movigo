@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
 
 class MovigoButton extends StatelessWidget {
   final String text;
@@ -11,14 +11,14 @@ class MovigoButton extends StatelessWidget {
   final bool isLoading;
 
   const MovigoButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isFullWidth = true,
     this.color,
     this.height,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

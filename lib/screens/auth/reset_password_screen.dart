@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/data/services/auth_service.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../../widgets/movigo_text_field.dart';
+import '../../data/services/auth_service.dart';
 
 class MovigoResetPasswordScreen extends StatefulWidget {
-  const MovigoResetPasswordScreen({Key? key}) : super(key: key);
+  const MovigoResetPasswordScreen({super.key});
 
   @override
   State<MovigoResetPasswordScreen> createState() =>

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/widgets/common/custom_button.dart';
+import '../../widgets/common/custom_button.dart';
 
 class TripCard extends StatelessWidget {
   final String origin;

@@ -1,6 +1,6 @@
 {
-    "name": "movigo_frontend",
-    "short_name": "movigo_frontend",
+    "name": "frontend_movigo",
+    "short_name": "frontend_movigo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

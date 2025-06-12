@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/data/services/auth_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../../data/services/auth_service.dart';
+import '../../core/navigation/route_helper.dart';
 
 class MovigoVerifyCodeScreen extends StatefulWidget {
-  const MovigoVerifyCodeScreen({Key? key}) : super(key: key);
+  const MovigoVerifyCodeScreen({super.key});
 
   @override
   State<MovigoVerifyCodeScreen> createState() => _MovigoVerifyCodeScreenState();

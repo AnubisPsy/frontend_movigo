@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/core/constants/api_constants.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/driver_service.dart';
-import 'package:movigo_frontend/data/services/socket_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/screens/driver/driver_negotiation_screen.dart';
+import '../../core/constants/api_constants.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../core/navigation/route_helper.dart';
+import '../../data/services/driver_service.dart';
+import '../../data/services/socket_service.dart';
+import '../../data/services/storage_service.dart';
+import '../../screens/driver/driver_negotiation_screen.dart';
 import 'package:http/http.dart' as http;
 
 class DriverHomeScreen extends StatefulWidget {

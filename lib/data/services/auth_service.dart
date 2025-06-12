@@ -1,7 +1,7 @@
 // lib/data/services/auth_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:movigo_frontend/core/constants/api_constants.dart';
+import '../../core/constants/api_constants.dart';
 
 class AuthService {
   static Future<Map<String, dynamic>> login(

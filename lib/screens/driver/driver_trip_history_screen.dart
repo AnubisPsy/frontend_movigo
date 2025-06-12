@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/driver_service.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../core/navigation/route_helper.dart';
+import '../../data/services/driver_service.dart';
 import 'package:intl/intl.dart';
 
 class DriverTripHistoryScreen extends StatefulWidget {

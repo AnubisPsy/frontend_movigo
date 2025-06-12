@@ -1,4 +1,4 @@
-# movigo_frontend
+# frontend_movigo
 
 A new Flutter project.
 

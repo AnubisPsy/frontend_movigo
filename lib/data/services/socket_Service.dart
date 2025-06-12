@@ -1,6 +1,6 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:movigo_frontend/core/constants/api_constants.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
+import '../../core/constants/api_constants.dart';
+import '../../data/services/storage_service.dart';
 
 class SocketService {
   static IO.Socket? _socket;

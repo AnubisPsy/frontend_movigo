@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/passenger_service.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../widgets/movigo_text_field.dart';
+import '../../core/navigation/route_helper.dart';
+import '../../data/services/passenger_service.dart';
 import 'dart:async';
-import 'package:movigo_frontend/data/services/socket_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
-import 'package:movigo_frontend/screens/passenger/trip_confirmation_screen.dart';
-import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
+import '../../data/services/socket_service.dart';
+import '../../data/services/storage_service.dart';
+import '../../widgets/map/mapa_en_tiempo_real.dart';
+import '../../screens/passenger/trip_confirmation_screen.dart';
+import '../../screens/common/trip_completed_screen.dart';
 
 class PassengerHomeScreen extends StatefulWidget {
   const PassengerHomeScreen({super.key});

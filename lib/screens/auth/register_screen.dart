@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/data/services/auth_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../../widgets/movigo_text_field.dart';
+import '../../data/services/auth_service.dart';
+import '../../data/services/storage_service.dart';
+import '../../core/navigation/route_helper.dart';
 
 class MovigoRegisterScreen extends StatefulWidget {
-  const MovigoRegisterScreen({Key? key}) : super(key: key);
+  const MovigoRegisterScreen({super.key});
 
   @override
   State<MovigoRegisterScreen> createState() => _MovigoRegisterScreenState();

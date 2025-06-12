@@ -9,10 +9,10 @@ class MapaEnTiempoReal extends StatefulWidget {
   final Map<String, dynamic>? tripData;
 
   const MapaEnTiempoReal({
-    Key? key,
+    super.key,
     this.esViajePendiente = false,
     this.tripData,
-  }) : super(key: key);
+  });
 
   @override
   State<MapaEnTiempoReal> createState() => _MapaEnTiempoRealState();
@@ -140,7 +140,7 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
         width: 40.0,
         height: 40.0,
         point: _currentPosition,
-        builder: (ctx) => const Icon(
+        child: const Icon(
           Icons.location_on,
           color: Colors.blue,
           size: 40.0,
@@ -162,7 +162,7 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
           width: 40.0,
           height: 40.0,
           point: origen,
-          builder: (ctx) => const Icon(
+          child: const Icon(
             Icons.location_on,
             color: Colors.green,
             size: 40.0,
@@ -175,7 +175,7 @@ class _MapaEnTiempoRealState extends State<MapaEnTiempoReal> {
           width: 40.0,
           height: 40.0,
           point: destino,
-          builder: (ctx) => const Icon(
+          child: const Icon(
             Icons.location_on,
             color: Colors.red,
             size: 40.0,

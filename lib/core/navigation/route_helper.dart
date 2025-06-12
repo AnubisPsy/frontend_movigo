@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
+import '../../data/services/storage_service.dart';
 
 class RouteHelper {
   // Rutas de Autenticación

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/data/services/driver_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/socket_service.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../widgets/movigo_text_field.dart';
+import '../../data/services/driver_service.dart';
+import '../../core/navigation/route_helper.dart';
+import '../../data/services/socket_service.dart';
 
 class DriverNegotiationScreen extends StatefulWidget {
   final Map<String, dynamic>? tripData;
 
-  const DriverNegotiationScreen({Key? key, this.tripData}) : super(key: key);
+  const DriverNegotiationScreen({super.key, this.tripData});
 
   @override
   State<DriverNegotiationScreen> createState() =>

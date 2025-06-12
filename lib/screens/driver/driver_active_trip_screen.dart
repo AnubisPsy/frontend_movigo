@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
-import 'package:movigo_frontend/data/services/driver_service.dart';
-import 'package:movigo_frontend/widgets/map/mapa_en_tiempo_real.dart';
-import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/movigo_button.dart';
+import '../../core/navigation/route_helper.dart';
+import '../../data/services/driver_service.dart';
+import '../../../widgets/map/mapa_en_tiempo_real.dart';
+import '../../screens/common/trip_completed_screen.dart';
 import 'dart:async';
-import 'package:movigo_frontend/data/services/socket_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
+import '../../data/services/socket_service.dart';
+import '../../data/services/storage_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovigoDriverActiveTripScreen extends StatefulWidget {
-  const MovigoDriverActiveTripScreen({Key? key}) : super(key: key);
+  const MovigoDriverActiveTripScreen({super.key});
 
   @override
   State<MovigoDriverActiveTripScreen> createState() =>

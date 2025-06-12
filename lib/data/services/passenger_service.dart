@@ -2,8 +2,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:movigo_frontend/core/constants/api_constants.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
+import '../../core/constants/api_constants.dart';
+import '../../data/services/storage_service.dart';
 
 class PassengerService {
   // Solicitar un viaje

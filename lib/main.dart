@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/screens/auth/login_screen.dart';
-import 'package:movigo_frontend/screens/auth/register_screen.dart';
-import 'package:movigo_frontend/screens/auth/forgot_password_screen.dart';
-import 'package:movigo_frontend/screens/auth/verify_code_screen.dart';
-import 'package:movigo_frontend/screens/auth/reset_password_screen.dart';
-import 'package:movigo_frontend/screens/common/trip_completed_screen.dart';
+import '../../screens/auth/login_screen.dart';
+import '../../screens/auth/register_screen.dart';
+import '../../screens/auth/forgot_password_screen.dart';
+import '../../screens/auth/verify_code_screen.dart';
+import '../../screens/auth/reset_password_screen.dart';
+import '../../screens/common/trip_completed_screen.dart';
 
 // Pantallas de pasajero
-import 'package:movigo_frontend/screens/passenger/passenger_home_screen.dart';
-import 'package:movigo_frontend/screens/passenger/passenger_history_screen.dart';
-import 'package:movigo_frontend/screens/passenger/trip_price_screen.dart';
+import '../../screens/passenger/passenger_home_screen.dart';
+import '../../screens/passenger/passenger_history_screen.dart';
+import '../../screens/passenger/trip_price_screen.dart';
 
 // Pantallas de conductor
-import 'package:movigo_frontend/screens/driver/vehicle_info_screen.dart';
-import 'package:movigo_frontend/screens/driver/driver_trip_history_screen.dart';
-import 'package:movigo_frontend/screens/driver/driver_home_screen.dart';
-import 'package:movigo_frontend/screens/driver/driver_active_trip_screen.dart';
-import 'package:movigo_frontend/screens/driver/driver_negotiation_screen.dart';
+import '../../screens/driver/vehicle_info_screen.dart';
+import '../../screens/driver/driver_trip_history_screen.dart';
+import '../../screens/driver/driver_home_screen.dart';
+import '../../screens/driver/driver_active_trip_screen.dart';
+import '../../screens/driver/driver_negotiation_screen.dart';
 
 //Pantallas del perfil
-import 'package:movigo_frontend/screens/profile/change_password_screen.dart';
-import 'package:movigo_frontend/screens/profile/edit_profile_screen.dart';
-import 'package:movigo_frontend/screens/profile/profile_screen.dart';
+import '../../screens/profile/change_password_screen.dart';
+import '../../screens/profile/edit_profile_screen.dart';
+import '../../screens/profile/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());

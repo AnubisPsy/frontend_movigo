@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:movigo_frontend/utils/colors.dart';
-import 'package:movigo_frontend/utils/constants.dart';
-import 'package:movigo_frontend/widgets/movigo_button.dart';
-import 'package:movigo_frontend/widgets/movigo_text_field.dart';
-import 'package:movigo_frontend/data/services/profile_service.dart';
-import 'package:movigo_frontend/data/services/storage_service.dart';
-import 'package:movigo_frontend/core/navigation/route_helper.dart';
+import '../../utils/colors.dart';
+import '../../utils/constants.dart';
+import '../../widgets/movigo_button.dart';
+import '../../widgets/movigo_text_field.dart';
+import '../../data/services/profile_service.dart';
+import '../../data/services/storage_service.dart';
+import '../../core/navigation/route_helper.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
